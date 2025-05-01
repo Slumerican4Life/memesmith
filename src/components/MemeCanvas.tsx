@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { MemeTemplate } from '../types/meme';
 import { Button } from '@/components/ui/button';
 import { Download, Share } from 'lucide-react';
-import { useToast } from '@/components/ui/toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface MemeCanvasProps {
   selectedTemplate: MemeTemplate | null;
@@ -96,7 +96,7 @@ const MemeCanvas = ({ selectedTemplate, topText, bottomText }: MemeCanvasProps) 
     if (!canvasRef.current) return;
     
     const link = document.createElement('a');
-    link.download = `slummeme-${Date.now()}.png`;
+    link.download = `memecraft-${Date.now()}.png`;
     link.href = canvasRef.current.toDataURL('image/png');
     link.click();
     

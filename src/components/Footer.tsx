@@ -7,10 +7,10 @@ const Footer = () => {
       <div className="container px-4 mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} SlumMemes. All rights reserved.
+            © {new Date().getFullYear()} MemeCraft. All rights reserved.
           </p>
           <p className="text-muted-foreground text-sm mt-2 md:mt-0">
-            Created with 💜 by the SlumMemes Crew
+            Created with 💜 by the MemeCraft Crew
           </p>
         </div>
       </div>
