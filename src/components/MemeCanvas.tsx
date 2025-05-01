@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { MemeTemplate } from '../types/meme';
 import { Button } from '@/components/ui/button';
-import { Download, Share } from 'lucide-react';
+import { Download, Share, Image } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface MemeCanvasProps {
@@ -96,7 +96,7 @@ const MemeCanvas = ({ selectedTemplate, topText, bottomText }: MemeCanvasProps) 
     if (!canvasRef.current) return;
     
     const link = document.createElement('a');
-    link.download = `memecraft-${Date.now()}.png`;
+    link.download = `memesmih-${Date.now()}.png`;
     link.href = canvasRef.current.toDataURL('image/png');
     link.click();
     
@@ -127,10 +127,11 @@ const MemeCanvas = ({ selectedTemplate, topText, bottomText }: MemeCanvasProps) 
   
   if (!selectedTemplate) {
     return (
-      <div className="flex flex-col items-center justify-center p-8 bg-card rounded-lg text-center min-h-[300px]">
-        <p className="text-lg font-medium">Select a template to preview your meme</p>
-        <div className="mt-4 animate-bounce-subtle">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <div className="flex flex-col items-center justify-center p-8 bg-card rounded-lg text-center min-h-[300px] border-2 border-dashed border-meme-purple/30 transition-all duration-300 hover:border-meme-purple/50">
+        <Image size={48} className="text-muted-foreground/50 mb-4" />
+        <p className="text-lg font-medium bg-gradient-to-r from-meme-purple to-meme-pink bg-clip-text text-transparent">Select a template to preview your meme</p>
+        <div className="mt-6 animate-bounce-subtle">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground/50">
             <path d="M12 5v14M5 12l7 7 7-7"/>
           </svg>
         </div>
@@ -140,18 +141,21 @@ const MemeCanvas = ({ selectedTemplate, topText, bottomText }: MemeCanvasProps) 
   
   return (
     <div className="flex flex-col items-center">
-      <h2 className="text-xl font-bold mb-4">Preview Your Meme</h2>
+      <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-meme-purple to-meme-pink bg-clip-text text-transparent">Preview Your Meme</h2>
       
-      <div className="bg-muted p-2 rounded-lg mb-4 max-w-full overflow-hidden shadow-lg">
-        <div className="relative">
+      <div className="bg-gradient-to-r from-meme-darkpurple/30 to-meme-pink/30 p-1 rounded-lg mb-6 max-w-full overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-[1.01] hover:shadow-xl">
+        <div className="relative bg-black rounded-md overflow-hidden">
           <canvas
             ref={canvasRef}
             className="max-w-full h-auto"
             style={{ maxHeight: '500px' }}
           />
           {!imageLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center bg-card bg-opacity-50">
-              <p className="text-lg font-medium">Loading...</p>
+            <div className="absolute inset-0 flex items-center justify-center bg-card bg-opacity-80 backdrop-blur-sm">
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 border-4 border-meme-purple border-t-transparent rounded-full animate-spin mb-4"></div>
+                <p className="text-lg font-medium">Loading...</p>
+              </div>
             </div>
           )}
         </div>
@@ -160,7 +164,7 @@ const MemeCanvas = ({ selectedTemplate, topText, bottomText }: MemeCanvasProps) 
       <div className="flex space-x-4">
         <Button 
           onClick={downloadMeme}
-          className="bg-meme-purple hover:bg-meme-darkpurple"
+          className="bg-gradient-to-r from-meme-purple to-meme-darkpurple hover:opacity-90 transform transition-all duration-300 hover:scale-105"
           disabled={!imageLoaded}
         >
           <Download className="mr-2 h-4 w-4" /> 
@@ -170,7 +174,7 @@ const MemeCanvas = ({ selectedTemplate, topText, bottomText }: MemeCanvasProps) 
         <Button 
           onClick={shareMeme}
           variant="outline" 
-          className="border-meme-purple text-meme-purple hover:bg-meme-purple/10"
+          className="border-meme-purple text-meme-purple hover:bg-meme-purple/10 transform transition-all duration-300 hover:scale-105"
           disabled={!imageLoaded}
         >
           <Share className="mr-2 h-4 w-4" /> 
