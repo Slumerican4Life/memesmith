@@ -41,13 +41,18 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-background/95">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgc3Ryb2tlPSIjOUI4N0Y1IiBzdHJva2Utb3BhY2l0eT0iLjAyIiBjeD0iMTAwIiBjeT0iMTAwIiByPSI5OCIvPjxwYXRoIGQ9Ik0xMDAgMmM1NiAwIDk4IDQyIDk4IDk4IDAgNTYtNDIgOTgtOTggOTgtNTQgMC05OC00NC05OC05OEMyIDQ0IDQ0IDIgMTAwIDJ6IiBzdHJva2U9IiNEOTQ2RUYiIHN0cm9rZS1vcGFjaXR5PSIuMDIiLz48L2c+PC9zdmc+')]"></div>
+      
       <Header />
       
-      <main className="container px-4 mx-auto flex-1 py-8">
+      <main className="container px-4 mx-auto flex-1 py-8 relative z-10">
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <p className="text-xl font-medium">Loading meme templates...</p>
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 border-4 border-t-transparent border-meme-purple rounded-full animate-spin"></div>
+              <p className="mt-4 text-xl font-medium bg-gradient-to-r from-meme-purple to-meme-pink bg-clip-text text-transparent">Loading meme templates...</p>
+            </div>
           </div>
         ) : (
           <>
@@ -57,7 +62,7 @@ const Index = () => {
               onSelectTemplate={setSelectedTemplate}
             />
             
-            <Separator className="my-8" />
+            <Separator className="my-10 bg-gradient-to-r from-transparent via-meme-purple/30 to-transparent h-[1px]" />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
@@ -68,11 +73,13 @@ const Index = () => {
                   onTextChange={handleTextChange}
                 />
                 
-                {/* Ad placeholder */}
-                <div className="mt-6 bg-card p-4 rounded-lg border border-dashed border-muted-foreground text-center">
-                  <p className="text-muted-foreground">
-                    Advertisement Placeholder
+                {/* Ad placeholder with improved design */}
+                <div className="mt-6 bg-gradient-to-br from-meme-darkpurple/20 to-meme-purple/10 p-5 rounded-lg border border-meme-purple/20 text-center relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-r from-meme-purple/0 via-meme-pink/5 to-meme-purple/0 transform translate-x-full group-hover:translate-x-0 transition-transform duration-1000"></div>
+                  <p className="font-medium text-muted-foreground group-hover:text-foreground transition-colors duration-300">
+                    Support MemeSmith
                   </p>
+                  <p className="text-xs mt-1 text-muted-foreground/70">Our sponsors help keep this service free</p>
                 </div>
               </div>
               
