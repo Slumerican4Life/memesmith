@@ -1,3 +1,4 @@
+
 # Welcome to your Lovable project
 
 ## Project info
@@ -59,6 +60,76 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+
+## Serverless Image Processing API
+
+MemeSmith includes a serverless image processing API for generating memes on the server side.
+
+### Local Development
+
+To test the Netlify Functions locally:
+
+1. Install the Netlify CLI:
+```sh
+npm install -g netlify-cli
+```
+
+2. Install function dependencies:
+```sh
+cd netlify/functions
+npm install
+cd ../..
+```
+
+3. Run the local development server:
+```sh
+netlify dev
+```
+
+### API Usage
+
+The API endpoint is `/api/process-image` and accepts POST requests with multipart form data:
+
+```javascript
+// Example of how to use the API
+const formData = new FormData();
+formData.append('image', imageFile); // File from input[type=file]
+formData.append('settings', JSON.stringify({
+  texts: [
+    {
+      content: "Top text",
+      x: 540, // center X coordinate
+      y: 100, // Y position from top
+      fontSize: 60,
+      color: "white",
+      strokeColor: "black",
+      strokeWidth: 2
+    },
+    {
+      content: "Bottom text",
+      x: 540,
+      y: 1800,
+      fontSize: 60
+    }
+  ]
+}));
+
+fetch('/api/process-image', {
+  method: 'POST',
+  body: formData
+})
+.then(response => response.blob())
+.then(blob => {
+  // Use the processed image blob
+  const url = URL.createObjectURL(blob);
+  image.src = url;
+})
+.catch(error => console.error('Error:', error));
+```
+
+### Deployment
+
+When deployed to Netlify, the API will be available at `https://your-site.netlify.app/api/process-image`.
 
 ## How can I deploy this project?
 

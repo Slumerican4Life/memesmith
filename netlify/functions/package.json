@@ -1,0 +1,10 @@
+
+{
+  "name": "memesmith-functions",
+  "version": "1.0.0",
+  "description": "Serverless functions for MemeSmith image processing",
+  "dependencies": {
+    "sharp": "^0.32.1",
+    "formidable": "^2.1.1"
+  }
+}
