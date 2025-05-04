@@ -1,64 +1,67 @@
 
 import React from 'react';
 import { MemeTemplate } from '../types/meme';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sparkles } from 'lucide-react';
 
 interface MemeGalleryProps {
   templates: MemeTemplate[];
   selectedTemplate: MemeTemplate | null;
   onSelectTemplate: (template: MemeTemplate) => void;
+  compact?: boolean;
 }
 
 const MemeGallery = ({ 
   templates, 
   selectedTemplate, 
-  onSelectTemplate 
+  onSelectTemplate,
+  compact = false 
 }: MemeGalleryProps) => {
   return (
-    <div className="w-full">
-      <h2 className="text-2xl font-bold mb-6 text-center relative">
-        <span className="bg-gradient-to-r from-meme-blue via-meme-purple to-meme-pink bg-clip-text text-transparent inline-block transform transition-all duration-500 hover:scale-105">
-          Choose a Template
-        </span>
-        <span className="absolute top-0 right-1/4 transform -translate-y-1/2">
-          <Sparkles size={16} className="text-meme-orange animate-pulse" />
-        </span>
-      </h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {templates.map((template) => (
-          <Card 
-            key={template.id}
-            className={`cursor-pointer transition-all duration-300 hover:shadow-lg ${
-              selectedTemplate?.id === template.id 
-                ? 'ring-2 ring-meme-pink shadow-lg shadow-meme-purple/20 scale-[1.02]' 
-                : 'hover:scale-105 hover:shadow-md hover:shadow-meme-purple/10'
-            }`}
-            onClick={() => onSelectTemplate(template)}
-          >
-            <CardContent className="p-2 overflow-hidden">
-              <div className="relative overflow-hidden rounded group">
-                <div className="aspect-video flex items-center justify-center bg-muted overflow-hidden">
-                  <img 
-                    src={template.url} 
-                    alt={template.name}
-                    className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </div>
-              </div>
-              <p className={`text-sm mt-2 text-center font-medium truncate transition-all duration-300 ${
-                selectedTemplate?.id === template.id 
-                  ? 'text-meme-pink' 
-                  : 'group-hover:text-meme-purple'
-              }`}>
-                {template.name}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
+    <div className={compact ? "pb-2" : "pb-6"}>
+      <div className="flex items-center mb-4">
+        <h2 className={`${compact ? "text-xl" : "text-3xl"} font-bold bg-gradient-to-r from-meme-blue to-meme-purple bg-clip-text text-transparent`}>
+          Choose a Meme Template
+        </h2>
+        <Sparkles size={compact ? 16 : 24} className="ml-2 text-meme-orange" />
       </div>
+      
+      <ScrollArea className={`w-full ${compact ? "h-[240px]" : "h-[320px]"}`}>
+        <div 
+          className={`grid grid-cols-3 ${compact ? "sm:grid-cols-4 md:grid-cols-6 gap-2" : "sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4"}`}
+        >
+          {templates.map((template) => (
+            <Card 
+              key={template.id}
+              className={`
+                group overflow-hidden relative cursor-pointer transition-all duration-300 hover-lift
+                ${selectedTemplate?.id === template.id 
+                  ? 'ring-2 ring-meme-pink ring-offset-2 ring-offset-background shadow-lg' 
+                  : 'hover:shadow-md'}
+              `}
+              onClick={() => onSelectTemplate(template)}
+            >
+              <div className="aspect-square overflow-hidden">
+                <img 
+                  src={template.url} 
+                  alt={template.name}
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  loading="lazy"
+                />
+              </div>
+              
+              {!compact && (
+                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 to-transparent p-2 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                  <p className="text-xs text-white text-center font-medium truncate">
+                    {template.name}
+                  </p>
+                </div>
+              )}
+            </Card>
+          ))}
+        </div>
+      </ScrollArea>
     </div>
   );
 };
