@@ -5,6 +5,8 @@
   "description": "Serverless functions for MemeSmith image processing",
   "dependencies": {
     "sharp": "^0.32.1",
-    "formidable": "^2.1.1"
+    "formidable": "^2.1.1",
+    "stripe": "^14.21.0",
+    "@supabase/supabase-js": "^2.39.7"
   }
 }

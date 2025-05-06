@@ -18,6 +18,8 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import UpdatePassword from "./pages/auth/UpdatePassword";
 import AuthCallback from "./pages/auth/AuthCallback";
 import Profile from "./pages/Profile";
+import ProUpgrade from "./pages/ProUpgrade";
+import UpgradeSuccess from "./pages/UpgradeSuccess";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +71,10 @@ const App = () => {
                   <Profile />
                 </ProtectedRoute>
               } />
+              
+              {/* Pro Upgrade Routes */}
+              <Route path="/upgrade" element={<ProUpgrade />} />
+              <Route path="/upgrade-success" element={<UpgradeSuccess />} />
               
               {/* Catch-all 404 route */}
               <Route path="*" element={<NotFound />} />

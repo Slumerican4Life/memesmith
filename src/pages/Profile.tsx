@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Loader2, LogOut, User } from 'lucide-react';
+import { Loader2, LogOut, User, Award, ChevronRight } from 'lucide-react';
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -19,6 +19,8 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { Card, CardContent } from '@/components/ui/card';
+import ProBadge from '@/components/ProBadge';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -117,7 +119,10 @@ const Profile = () => {
                 <User className="h-8 w-8 text-meme-purple" />
               </div>
               <div className="ml-4">
-                <h1 className="text-2xl font-bold">Profile</h1>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-bold">Profile</h1>
+                  {profile.is_pro && <ProBadge />}
+                </div>
                 <p className="text-muted-foreground">
                   Manage your account settings
                 </p>
@@ -147,7 +152,10 @@ const Profile = () => {
                       {profile.is_pro ? (
                         <div className="flex items-center">
                           <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"></span>
-                          <span className="font-medium">Pro Member</span>
+                          <span className="font-medium flex items-center">
+                            Pro Member
+                            <Award className="ml-2 w-4 h-4 text-meme-purple" />
+                          </span>
                         </div>
                       ) : (
                         <div className="flex items-center">
@@ -160,7 +168,29 @@ const Profile = () => {
                 </div>
               </div>
               
-              <Separator />
+              {/* Upgrade to Pro Card */}
+              {!profile.is_pro && (
+                <>
+                  <Card className="bg-gradient-to-r from-meme-purple/10 to-meme-pink/10 border-meme-purple/30">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h3 className="font-semibold text-lg">Upgrade to Pro</h3>
+                          <p className="text-sm text-muted-foreground">Unlock premium features and templates</p>
+                        </div>
+                        <Button 
+                          className="bg-meme-purple hover:bg-meme-purple/90"
+                          onClick={() => navigate('/upgrade')}
+                        >
+                          Upgrade
+                          <ChevronRight className="ml-1 h-4 w-4" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Separator />
+                </>
+              )}
               
               {/* Profile Form */}
               <Form {...form}>
