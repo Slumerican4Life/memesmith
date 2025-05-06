@@ -41,7 +41,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
       
-      setProfile(data);
+      // Make sure we process the data to match our UserProfile type
+      const profileData: UserProfile = {
+        id: data.id,
+        email: data.email,
+        username: data.username,
+        created_at: data.created_at,
+        is_pro: data.is_pro || false, // Default to false if not present
+        wins: data.wins,
+        losses: data.losses,
+        profile_pic_url: data.profile_pic_url
+      };
+      
+      setProfile(profileData);
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
