@@ -23,6 +23,9 @@ import ProUpgrade from "./pages/ProUpgrade";
 import UpgradeSuccess from "./pages/UpgradeSuccess";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import MemeDetail from "./pages/MemeDetail";
+import MyMemes from "./pages/MyMemes";
+import ExploreMemes from "./pages/ExploreMemes";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +64,15 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<MobileRedirect />} />
                 <Route path="/mobile" element={<MobileMeme />} />
+                
+                {/* Meme Routes */}
+                <Route path="/memes/:id" element={<MemeDetail />} />
+                <Route path="/my-memes" element={
+                  <ProtectedRoute>
+                    <MyMemes />
+                  </ProtectedRoute>
+                } />
+                <Route path="/explore" element={<ExploreMemes />} />
                 
                 {/* Auth Routes */}
                 <Route path="/auth/login" element={<Login />} />

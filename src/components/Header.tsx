@@ -1,13 +1,18 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { User, Award, Flame, Sword } from 'lucide-react';
+import { User, Award, Flame, Sword, Image, Compass } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProBadge from './ProBadge';
 
 const Header = () => {
   const { user, profile, signOut } = useAuth();
+  const location = useLocation();
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
   return (
     <header className="border-b border-border py-4 bg-background/95 backdrop-blur-sm sticky top-0 z-50">
@@ -48,10 +53,35 @@ const Header = () => {
         <nav>
           <ul className="flex items-center gap-6">
             <li>
-              <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link 
+                to="/" 
+                className={`${isActive('/') ? 'text-foreground' : 'text-muted-foreground'} hover:text-foreground transition-colors flex items-center gap-1`}
+              >
                 Create
               </Link>
             </li>
+            
+            <li>
+              <Link 
+                to="/explore" 
+                className={`${isActive('/explore') ? 'text-foreground' : 'text-muted-foreground'} hover:text-foreground transition-colors flex items-center gap-1`}
+              >
+                <Compass className="w-4 h-4" />
+                Explore
+              </Link>
+            </li>
+            
+            {user && (
+              <li>
+                <Link 
+                  to="/my-memes" 
+                  className={`${isActive('/my-memes') ? 'text-foreground' : 'text-muted-foreground'} hover:text-foreground transition-colors flex items-center gap-1`}
+                >
+                  <Image className="w-4 h-4" />
+                  My Memes
+                </Link>
+              </li>
+            )}
             
             {!user && (
               <li>
