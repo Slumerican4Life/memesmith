@@ -25,7 +25,11 @@ const ProBadge: React.FC<ProBadgeProps> = ({
                  bg-gradient-to-r from-meme-purple to-meme-pink text-white 
                  ${sizeClasses[size]} ${className}`}
     >
-      {showIcon && <Crown className={`${size === 'sm' ? 'w-3 h-3' : size === 'md' ? 'w-4 h-4' : 'w-5 h-5'} mr-1`} />}
+      {showIcon && (
+        <Crown 
+          className={`${size === 'sm' ? 'w-3 h-3' : size === 'md' ? 'w-4 h-4' : 'w-5 h-5'} mr-1`}
+        />
+      )}
       Pro
     </span>
   );

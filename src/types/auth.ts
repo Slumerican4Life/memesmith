@@ -1,11 +1,11 @@
 
 export interface UserProfile {
   id: string;
-  email: string | null;
+  email: string;
   username: string | null;
   created_at: string;
+  profile_pic_url: string | null;
+  wins: number;
+  losses: number;
   is_pro: boolean;
-  wins?: number;
-  losses?: number;
-  profile_pic_url?: string | null;
 }
