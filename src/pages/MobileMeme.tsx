@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import ProBadge from '@/components/ProBadge';
+import Head from '@/components/Head';
 
 const MobileMeme = () => {
   const navigate = useNavigate();
@@ -66,8 +67,22 @@ const MobileMeme = () => {
     }
   }, [isMobile, navigate]);
   
+  // Generate dynamic meta description based on selected template
+  const metaDescription = selectedTemplate 
+    ? `Create a "${selectedTemplate.name}" meme on MemeSmith - the web's easiest meme generator.` 
+    : 'Create mobile memes with MemeSmith - the web\'s easiest meme generator.';
+
+  // Generate dynamic meta image based on selected template
+  const metaImage = selectedTemplate ? selectedTemplate.url : 'https://lovable.dev/opengraph-image-p98pqg.png';
+  
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <Head 
+        title="MemeSmith Mobile Editor"
+        description={metaDescription}
+        image={metaImage}
+      />
+      
       {/* Simplified header for mobile */}
       <header className="p-4 border-b border-border relative">
         <Button 

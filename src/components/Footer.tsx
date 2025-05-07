@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Heart, Sparkles } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
@@ -29,9 +30,9 @@ const Footer = () => {
         </div>
         
         <div className="mt-6 border-t border-border/30 pt-4 flex flex-col md:flex-row justify-center items-center gap-4 text-xs text-muted-foreground/70">
-          <a href="#" className="hover:text-meme-purple transition-colors duration-200">Privacy Policy</a>
-          <a href="#" className="hover:text-meme-purple transition-colors duration-200">Terms of Service</a>
-          <a href="#" className="hover:text-meme-purple transition-colors duration-200">Contact Us</a>
+          <Link to="/privacy" className="hover:text-meme-purple transition-colors duration-200">Privacy Policy</Link>
+          <Link to="/terms" className="hover:text-meme-purple transition-colors duration-200">Terms of Service</Link>
+          <Link to="mailto:contact@memesmith.com" className="hover:text-meme-purple transition-colors duration-200">Contact Us</Link>
           <p>Meme responsibly!</p>
         </div>
       </div>

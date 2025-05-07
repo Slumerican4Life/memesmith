@@ -5,6 +5,7 @@ import Footer from "@/components/Footer";
 import MemeGallery from "@/components/MemeGallery";
 import MemeEditor from "@/components/MemeEditor";
 import MemeCanvas from "@/components/MemeCanvas";
+import Head from "@/components/Head";
 import { MemeTemplate } from "@/types/meme";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
@@ -46,8 +47,22 @@ const Index = () => {
     }
   };
 
+  // Generate dynamic meta description based on selected template
+  const metaDescription = selectedTemplate 
+    ? `Create a "${selectedTemplate.name}" meme on MemeSmith - the web's easiest meme generator.` 
+    : 'Create, download, and share your own custom memes with MemeSmith - the web\'s easiest meme generator.';
+
+  // Generate dynamic meta image based on selected template
+  const metaImage = selectedTemplate ? selectedTemplate.url : 'https://lovable.dev/opengraph-image-p98pqg.png';
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-background/95">
+      <Head 
+        title={selectedTemplate ? `Create ${selectedTemplate.name} Meme` : undefined}
+        description={metaDescription}
+        image={metaImage}
+      />
+      
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgc3Ryb2tlPSIjOUI4N0Y1IiBzdHJva2Utb3BhY2l0eT0iLjAyIiBjeD0iMTAwIiBjeT0iMTAwIiByPSI5OCIvPjxwYXRoIGQ9Ik0xMDAgMmM1NiAwIDk4IDQyIDk4IDk4IDAgNTYtNDIgOTgtOTggOTgtNTQgMC05OC00NC05OC05OEMyIDQ0IDQ0IDIgMTAwIDJ6IiBzdHJva2U9IiNEOTQ2RUYiIHN0cm9rZS1vcGFjaXR5PSIuMDIiLz48L2c+PC9zdmc+')]"></div>
       
       <Header />
