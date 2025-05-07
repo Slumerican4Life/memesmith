@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { User, Award } from 'lucide-react';
+import { User, Award, Flame, Sword } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProBadge from './ProBadge';
 
@@ -12,10 +12,37 @@ const Header = () => {
   return (
     <header className="border-b border-border py-4 bg-background/95 backdrop-blur-sm sticky top-0 z-50">
       <div className="container px-4 mx-auto flex justify-between items-center">
-        <Link to="/" className="flex items-center">
-          <h1 className="text-2xl font-extrabold bg-gradient-to-r from-meme-purple to-meme-pink bg-clip-text text-transparent">
-            MemeSmith
-          </h1>
+        <Link to="/" className="flex flex-col items-center">
+          {/* Logo container with fire effect and title */}
+          <div className="relative group">
+            {/* Fire effect behind the text */}
+            <div className="absolute -inset-1 -z-10 flex">
+              <div className="w-full h-10 bg-gradient-to-t from-meme-orange via-[#ea384c] to-[#f97316]/80 blur-sm"></div>
+              <Flame className="absolute -top-2 left-0 h-7 w-7 text-[#ea384c] animate-pulse" />
+              <Flame className="absolute -top-3 left-6 h-6 w-6 text-[#f97316] animate-pulse-subtle" />
+              <Flame className="absolute -top-2 right-3 h-5 w-5 text-[#ea384c] animate-pulse" />
+            </div>
+            
+            {/* MemeSmith title */}
+            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-white to-[#f3f3f3] bg-clip-text text-transparent relative z-10">
+              MemeSmith
+            </h1>
+            
+            {/* Embers/particles effect */}
+            <div className="absolute top-0 left-1/4 h-1 w-1 bg-[#ffafbd] rounded-full animate-ping"></div>
+            <div className="absolute top-1 right-1/3 h-1 w-1 bg-[#ffc3a0] rounded-full animate-ping delay-700"></div>
+          </div>
+          
+          {/* Sword element underneath */}
+          <div className="relative mt-1 w-full flex justify-center items-center">
+            <div className="h-[3px] w-full bg-gradient-to-r from-[#9F9EA1]/30 via-[#eee] to-[#9F9EA1]/30 rounded-full relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent animate-pulse-subtle"></div>
+            </div>
+            <Sword className="absolute -right-3 h-4 w-4 text-[#ccc] transform -rotate-45" />
+            <div className="absolute -bottom-4 left-1/2 transform -translate-x-1/2 text-[7px] font-mono text-[#ccc] tracking-widest uppercase opacity-70">
+              MemeSmith
+            </div>
+          </div>
         </Link>
         
         <nav>

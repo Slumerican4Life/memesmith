@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Heart, Sparkles } from 'lucide-react';
+import { Heart, Sparkles, Flame, Sword } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
@@ -16,9 +16,16 @@ const Footer = () => {
       <div className="container px-4 mx-auto relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="relative group">
-            <p className="text-muted-foreground text-sm font-medium">
-              © {new Date().getFullYear()} <span className="bg-gradient-to-r from-meme-purple to-meme-pink bg-clip-text text-transparent group-hover:font-bold transition-all duration-300">MemeSmith</span>. All rights reserved.
-            </p>
+            <div className="flex items-center gap-1">
+              <p className="text-muted-foreground text-sm font-medium">
+                © {new Date().getFullYear()} 
+                <span className="bg-gradient-to-r from-meme-purple to-meme-pink bg-clip-text text-transparent group-hover:font-bold transition-all duration-300 ml-1">
+                  MemeSmith
+                </span>
+              </p>
+              <Flame size={10} className="text-meme-orange animate-pulse" />
+              <Sword size={10} className="text-[#9F9EA1] transform -rotate-45" />
+            </div>
             <span className="absolute -top-3 -right-3 transform rotate-12 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <Sparkles size={12} className="text-meme-pink" />
             </span>
