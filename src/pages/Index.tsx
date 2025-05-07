@@ -7,6 +7,9 @@ import MemeEditor from "@/components/MemeEditor";
 import MemeCanvas from "@/components/MemeCanvas";
 import { MemeTemplate } from "@/types/meme";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/contexts/AuthContext";
+import { Badge } from "@/components/ui/badge";
+import { Crown } from "lucide-react";
 
 const Index = () => {
   const [templates, setTemplates] = useState<MemeTemplate[]>([]);
@@ -14,6 +17,9 @@ const Index = () => {
   const [topText, setTopText] = useState("");
   const [bottomText, setBottomText] = useState("");
   const [loading, setLoading] = useState(true);
+  const [effect, setEffect] = useState<'none' | 'glow' | 'golden'>('none');
+  const { profile } = useAuth();
+  const isPro = profile?.is_pro || false;
   
   // Load templates from JSON file
   useEffect(() => {
@@ -56,6 +62,17 @@ const Index = () => {
           </div>
         ) : (
           <>
+            {isPro && (
+              <div className="mb-4">
+                <Badge className="bg-gradient-to-r from-meme-purple to-meme-pink border-none">
+                  <Crown className="h-3 w-3 mr-1" /> Pro Account
+                </Badge>
+                <span className="ml-2 text-sm text-muted-foreground">
+                  You have access to premium features!
+                </span>
+              </div>
+            )}
+            
             <MemeGallery 
               templates={templates}
               selectedTemplate={selectedTemplate}
@@ -71,16 +88,20 @@ const Index = () => {
                   topText={topText}
                   bottomText={bottomText}
                   onTextChange={handleTextChange}
+                  effect={effect}
+                  onEffectChange={isPro ? setEffect : undefined}
                 />
                 
-                {/* Ad placeholder with improved design */}
-                <div className="mt-6 bg-gradient-to-br from-meme-darkpurple/20 to-meme-purple/10 p-5 rounded-lg border border-meme-purple/20 text-center relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-                  <div className="absolute inset-0 bg-gradient-to-r from-meme-purple/0 via-meme-pink/5 to-meme-purple/0 transform translate-x-full group-hover:translate-x-0 transition-transform duration-1000"></div>
-                  <p className="font-medium text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-                    Support MemeSmith
-                  </p>
-                  <p className="text-xs mt-1 text-muted-foreground/70">Our sponsors help keep this service free</p>
-                </div>
+                {/* Ad placeholder with improved design - only shown for free users */}
+                {!isPro && (
+                  <div className="mt-6 bg-gradient-to-br from-meme-darkpurple/20 to-meme-purple/10 p-5 rounded-lg border border-meme-purple/20 text-center relative overflow-hidden group hover:shadow-lg transition-all duration-300">
+                    <div className="absolute inset-0 bg-gradient-to-r from-meme-purple/0 via-meme-pink/5 to-meme-purple/0 transform translate-x-full group-hover:translate-x-0 transition-transform duration-1000"></div>
+                    <p className="font-medium text-muted-foreground group-hover:text-foreground transition-colors duration-300">
+                      Support MemeSmith
+                    </p>
+                    <p className="text-xs mt-1 text-muted-foreground/70">Our sponsors help keep this service free</p>
+                  </div>
+                )}
               </div>
               
               <div>
@@ -88,6 +109,7 @@ const Index = () => {
                   selectedTemplate={selectedTemplate}
                   topText={topText}
                   bottomText={bottomText}
+                  effect={effect}
                 />
               </div>
             </div>

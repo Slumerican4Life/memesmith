@@ -9,6 +9,11 @@ import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MemeGallery from "@/components/MemeGallery";
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/contexts/AuthContext';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import ProBadge from '@/components/ProBadge';
 
 const MobileMeme = () => {
   const navigate = useNavigate();
@@ -18,7 +23,10 @@ const MobileMeme = () => {
   const [topText, setTopText] = useState("");
   const [bottomText, setBottomText] = useState("");
   const [loading, setLoading] = useState(true);
+  const [effect, setEffect] = useState<'none' | 'glow' | 'golden'>('none');
   const isMobile = useIsMobile();
+  const { profile } = useAuth();
+  const isPro = profile?.is_pro || false;
   
   // Load templates from JSON file
   React.useEffect(() => {
@@ -73,6 +81,11 @@ const MobileMeme = () => {
         <h1 className="text-center text-xl font-bold bg-gradient-to-r from-meme-purple to-meme-pink bg-clip-text text-transparent">
           MemeSmith Mobile
         </h1>
+        {isPro && (
+          <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+            <ProBadge size="sm" />
+          </div>
+        )}
       </header>
       
       <main className="flex-1 p-4 overflow-y-auto">
@@ -113,12 +126,67 @@ const MobileMeme = () => {
           </TabsContent>
         </Tabs>
         
-        <div className="mt-4 pb-20">
+        <div className="mt-4 space-y-4">
+          {(selectedTemplate || customImage) && (
+            <div className="space-y-3">
+              <div>
+                <Label htmlFor="topText">Top Text</Label>
+                <Input
+                  id="topText"
+                  value={topText}
+                  onChange={(e) => setTopText(e.target.value)}
+                  placeholder="Enter top text"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="bottomText">Bottom Text</Label>
+                <Input
+                  id="bottomText"
+                  value={bottomText}
+                  onChange={(e) => setBottomText(e.target.value)}
+                  placeholder="Enter bottom text"
+                />
+              </div>
+              
+              {isPro && (
+                <div>
+                  <div className="flex items-center mb-2">
+                    <Label className="text-sm font-medium flex items-center">
+                      Pro Effects
+                      <ProBadge size="sm" className="ml-2" />
+                    </Label>
+                  </div>
+                  
+                  <RadioGroup
+                    value={effect}
+                    onValueChange={(value) => setEffect(value as 'none' | 'glow' | 'golden')}
+                    className="flex items-center space-x-4"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="none" id="m-effect-none" />
+                      <Label htmlFor="m-effect-none" className="text-sm">None</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="glow" id="m-effect-glow" />
+                      <Label htmlFor="m-effect-glow" className="text-sm">Glow</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="golden" id="m-effect-golden" />
+                      <Label htmlFor="m-effect-golden" className="text-sm">Golden</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              )}
+            </div>
+          )}
+          
           <MemeCanvas
             selectedTemplate={selectedTemplate}
             customImage={customImage}
             topText={topText}
             bottomText={bottomText}
+            effect={effect}
           />
         </div>
       </main>

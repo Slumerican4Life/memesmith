@@ -4,20 +4,30 @@ import { MemeTemplate } from '../types/meme';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Sparkles } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import ProBadge from './ProBadge';
 
 interface MemeEditorProps {
   selectedTemplate: MemeTemplate | null;
   topText: string;
   bottomText: string;
   onTextChange: (type: 'top' | 'bottom', value: string) => void;
+  effect?: 'none' | 'glow' | 'golden';
+  onEffectChange?: (effect: 'none' | 'glow' | 'golden') => void;
 }
 
 const MemeEditor = ({ 
   selectedTemplate, 
   topText, 
   bottomText, 
-  onTextChange 
+  onTextChange,
+  effect = 'none',
+  onEffectChange
 }: MemeEditorProps) => {
+  const { profile } = useAuth();
+  const isPro = profile?.is_pro || false;
+  
   if (!selectedTemplate) {
     return (
       <div className="flex flex-col p-6 bg-gradient-to-br from-card to-card/80 rounded-lg text-center border border-meme-purple/10 shadow-md">
@@ -58,12 +68,49 @@ const MemeEditor = ({
           />
         </div>
         
+        {/* Pro Effects Section */}
+        {isPro && onEffectChange && (
+          <div className="pt-3 border-t border-meme-purple/10">
+            <div className="flex items-center mb-2">
+              <Label className="text-sm font-medium flex items-center">
+                Pro Effects
+                <ProBadge size="sm" className="ml-2" />
+              </Label>
+            </div>
+            
+            <RadioGroup
+              value={effect}
+              onValueChange={(value) => onEffectChange(value as 'none' | 'glow' | 'golden')}
+              className="flex items-center space-x-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="none" id="effect-none" />
+                <Label htmlFor="effect-none" className="text-sm">None</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="glow" id="effect-glow" />
+                <Label htmlFor="effect-glow" className="text-sm">Glow</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="golden" id="effect-golden" />
+                <Label htmlFor="effect-golden" className="text-sm">Golden</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        )}
+        
+        {/* Pro Tips Section */}
         <div className="pt-2 text-xs text-muted-foreground/70 bg-meme-purple/5 p-2 rounded-md">
           <p className="font-medium mb-1">Pro Tips:</p>
           <ul className="list-disc list-inside space-y-1 pl-2">
             <li>Keep text short and punchy for maximum impact</li>
             <li>ALL CAPS often works best for classic meme style</li>
             <li>Try different templates if your text doesn't fit well</li>
+            {!isPro && (
+              <li className="text-meme-purple">
+                <span className="font-semibold">Upgrade to Pro</span> to remove watermark and unlock effects!
+              </li>
+            )}
           </ul>
         </div>
       </div>

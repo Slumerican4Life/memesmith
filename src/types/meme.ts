@@ -14,4 +14,5 @@ export interface MemeTemplate {
     top: TextPosition;
     bottom: TextPosition;
   };
+  pro_only?: boolean;
 }

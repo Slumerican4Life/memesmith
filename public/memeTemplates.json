@@ -87,5 +87,53 @@
       "top": { "x": 600, "y": 100 },
       "bottom": { "x": 600, "y": 980 }
     }
+  },
+  {
+    "id": "fancy-winnie",
+    "name": "Fancy Winnie Pooh",
+    "url": "/memes/fancy-winnie.jpg",
+    "width": 600,
+    "height": 799,
+    "textPositions": {
+      "top": { "x": 300, "y": 180 },
+      "bottom": { "x": 300, "y": 620 }
+    },
+    "pro_only": true
+  },
+  {
+    "id": "galaxy-brain",
+    "name": "Galaxy Brain",
+    "url": "/memes/galaxy-brain.jpg",
+    "width": 640,
+    "height": 1024,
+    "textPositions": {
+      "top": { "x": 320, "y": 120 },
+      "bottom": { "x": 320, "y": 900 }
+    },
+    "pro_only": true
+  },
+  {
+    "id": "success-kid",
+    "name": "Success Kid",
+    "url": "/memes/success-kid.jpg",
+    "width": 735,
+    "height": 500,
+    "textPositions": {
+      "top": { "x": 370, "y": 80 },
+      "bottom": { "x": 370, "y": 450 }
+    },
+    "pro_only": true
+  },
+  {
+    "id": "thinking-meme",
+    "name": "Thinking Meme",
+    "url": "/memes/thinking-meme.jpg",
+    "width": 600,
+    "height": 600,
+    "textPositions": {
+      "top": { "x": 300, "y": 80 },
+      "bottom": { "x": 300, "y": 520 }
+    },
+    "pro_only": true
   }
 ]
