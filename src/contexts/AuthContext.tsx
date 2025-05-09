@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, useEffect, FC, ReactNode } from 'react';
 import { supabase } from '../integrations/supabase/client';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Session, User } from '@supabase/supabase-js';
+import { Session, User, Provider } from '@supabase/supabase-js';
 import { UserProfile } from '@/types/auth';
 import { toast } from '@/hooks/use-toast';
 
@@ -10,9 +10,13 @@ interface AuthContextValue {
   session: Session | null;
   user: User | null;
   profile: UserProfile | null;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, username?: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<{ error?: { message: string } }>;
+  signUp: (email: string, password: string, username?: string) => Promise<{ error?: { message: string } }>;
   signOut: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error?: { message: string } }>;
+  updatePassword: (password: string) => Promise<{ error?: { message: string } }>;
+  signInWithGoogle: () => Promise<void>;
+  signInWithGithub: () => Promise<void>;
   loading: boolean;
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
 }
@@ -105,7 +109,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   // Sign in with email and password
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
         toast({
@@ -113,16 +117,17 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
           description: error.message,
           variant: "destructive",
         });
-        throw error;
+        return { error };
       }
       
       // User will be set by the onAuthStateChange listener
       const returnTo = new URLSearchParams(location.search).get('returnTo') || '/';
       navigate(returnTo);
       
+      return { error: undefined };
     } catch (error: any) {
       console.error('Error in signIn:', error);
-      throw error;
+      return { error: { message: error.message || "An error occurred during sign in" } };
     }
   };
 
@@ -145,7 +150,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
           description: error.message,
           variant: "destructive",
         });
-        throw error;
+        return { error };
       }
       
       if (data.user) {
@@ -173,9 +178,10 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         navigate('/');
       }
       
+      return { error: undefined };
     } catch (error: any) {
       console.error('Error in signUp:', error);
-      throw error;
+      return { error: { message: error.message || "An error occurred during sign up" } };
     }
   };
 
@@ -194,6 +200,88 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       
     } catch (error) {
       console.error('Error in signOut:', error);
+    }
+  };
+
+  // Reset password (send password reset email)
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/update-password`,
+      });
+      
+      if (error) {
+        return { error };
+      }
+      
+      return { error: undefined };
+    } catch (error: any) {
+      console.error('Error in resetPassword:', error);
+      return { error: { message: error.message || "An error occurred during password reset" } };
+    }
+  };
+
+  // Update password
+  const updatePassword = async (password: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
+      
+      if (error) {
+        return { error };
+      }
+      
+      return { error: undefined };
+    } catch (error: any) {
+      console.error('Error in updatePassword:', error);
+      return { error: { message: error.message || "An error occurred during password update" } };
+    }
+  };
+
+  // Sign in with Google
+  const signInWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Google sign in failed",
+          description: error.message,
+        });
+        throw error;
+      }
+    } catch (error: any) {
+      console.error('Error in signInWithGoogle:', error);
+      throw error;
+    }
+  };
+
+  // Sign in with GitHub
+  const signInWithGithub = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "GitHub sign in failed",
+          description: error.message,
+        });
+        throw error;
+      }
+    } catch (error: any) {
+      console.error('Error in signInWithGithub:', error);
+      throw error;
     }
   };
   
@@ -237,6 +325,10 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     signIn,
     signUp,
     signOut,
+    resetPassword,
+    updatePassword,
+    signInWithGoogle,
+    signInWithGithub,
     loading,
     updateProfile,
   };
