@@ -211,8 +211,18 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       });
       
       if (error) {
+        toast({
+          title: "Password reset failed",
+          description: error.message,
+          variant: "destructive",
+        });
         return { error };
       }
+      
+      toast({
+        title: "Password reset email sent",
+        description: "Check your email for a password reset link",
+      });
       
       return { error: undefined };
     } catch (error: any) {
@@ -227,8 +237,18 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       const { error } = await supabase.auth.updateUser({ password });
       
       if (error) {
+        toast({
+          title: "Password update failed",
+          description: error.message,
+          variant: "destructive",
+        });
         return { error };
       }
+      
+      toast({
+        title: "Password updated",
+        description: "Your password has been updated successfully",
+      });
       
       return { error: undefined };
     } catch (error: any) {

@@ -2,10 +2,16 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
 
-// Initialize Supabase client with service role key to bypass RLS
+// Initialize Supabase client
 const supabaseUrl = 'https://btbifnkqslcleqyxptec.supabase.co';
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Helper for debugging logs
+const logStep = (step, details) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
+};
 
 exports.handler = async (event, context) => {
   // Set CORS headers
@@ -17,6 +23,7 @@ exports.handler = async (event, context) => {
   
   // Handle OPTIONS request (preflight)
   if (event.httpMethod === 'OPTIONS') {
+    logStep('Handling preflight request');
     return {
       statusCode: 200,
       headers,
@@ -26,6 +33,7 @@ exports.handler = async (event, context) => {
   
   try {
     if (event.httpMethod !== 'POST') {
+      logStep('Invalid HTTP method', { method: event.httpMethod });
       return {
         statusCode: 405,
         headers,
@@ -33,10 +41,12 @@ exports.handler = async (event, context) => {
       };
     }
     
+    logStep('Processing checkout request');
     // Parse the request body
     const { userId, returnUrl } = JSON.parse(event.body);
     
     if (!userId) {
+      logStep('Missing userId');
       return {
         statusCode: 400,
         headers,
@@ -44,6 +54,7 @@ exports.handler = async (event, context) => {
       };
     }
     
+    logStep('Creating Stripe session', { userId });
     // Create a Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -70,6 +81,8 @@ exports.handler = async (event, context) => {
       }
     });
     
+    logStep('Checkout session created', { sessionId: session.id });
+    
     return {
       statusCode: 200,
       headers,
@@ -77,7 +90,7 @@ exports.handler = async (event, context) => {
     };
     
   } catch (error) {
-    console.error('Stripe checkout error:', error);
+    logStep('Stripe checkout error', { error: error.message });
     return {
       statusCode: 500,
       headers,

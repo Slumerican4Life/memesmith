@@ -7,8 +7,16 @@ const supabaseUrl = 'https://btbifnkqslcleqyxptec.supabase.co';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+// Helper for debugging logs
+const logStep = (step, details) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[STRIPE-WEBHOOK] ${step}${detailsStr}`);
+};
+
 exports.handler = async (event) => {
   try {
+    logStep("Webhook received", { method: event.httpMethod });
+    
     // Verify the webhook signature
     const stripeSignature = event.headers['stripe-signature'];
     
@@ -18,13 +26,15 @@ exports.handler = async (event) => {
     let stripeEvent;
     
     try {
+      logStep("Verifying webhook signature");
       stripeEvent = stripe.webhooks.constructEvent(
         event.body,
         stripeSignature,
         endpointSecret
       );
+      logStep("Webhook signature verified", { type: stripeEvent.type });
     } catch (err) {
-      console.error('Webhook signature verification failed:', err);
+      logStep("Webhook signature verification failed", { error: err.message });
       return {
         statusCode: 400,
         body: JSON.stringify({ error: `Webhook signature verification failed: ${err.message}` }),
@@ -34,18 +44,20 @@ exports.handler = async (event) => {
     // Handle the event
     if (stripeEvent.type === 'checkout.session.completed') {
       const session = stripeEvent.data.object;
+      logStep("Processing checkout.session.completed", { sessionId: session.id });
       
       // Get the userId from the client_reference_id
       const userId = session.client_reference_id;
       
       if (!userId) {
-        console.error('No userId found in session metadata');
+        logStep("No userId found in session metadata");
         return {
           statusCode: 400,
           body: JSON.stringify({ error: 'No userId found in session metadata' }),
         };
       }
       
+      logStep("Updating user profile", { userId });
       // Update the user's profile to set is_pro to true
       const { error } = await supabase
         .from('users')
@@ -53,14 +65,14 @@ exports.handler = async (event) => {
         .eq('id', userId);
       
       if (error) {
-        console.error('Error updating user profile:', error);
+        logStep("Error updating user profile", { error });
         return {
           statusCode: 500,
           body: JSON.stringify({ error: 'Error updating user profile' }),
         };
       }
       
-      console.log(`Successfully upgraded user ${userId} to Pro!`);
+      logStep(`Successfully upgraded user ${userId} to Pro!`);
     }
     
     return {
@@ -69,7 +81,7 @@ exports.handler = async (event) => {
     };
     
   } catch (error) {
-    console.error('Webhook error:', error);
+    logStep("Webhook error", { message: error.message });
     return {
       statusCode: 500,
       body: JSON.stringify({ error: error.message }),

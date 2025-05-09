@@ -27,7 +27,14 @@ import MemeDetail from "./pages/MemeDetail";
 import MyMemes from "./pages/MyMemes";
 import ExploreMemes from "./pages/ExploreMemes";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 // Register service worker
 const registerServiceWorker = async () => {
@@ -54,13 +61,13 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <HelmetProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <InstallPWA />
-            <BrowserRouter>
+      <BrowserRouter>
+        <AuthProvider>
+          <HelmetProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <InstallPWA />
               <Routes>
                 <Route path="/" element={<MobileRedirect />} />
                 <Route path="/mobile" element={<MobileMeme />} />
@@ -99,10 +106,10 @@ const App = () => {
                 {/* Catch-all 404 route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </HelmetProvider>
-      </AuthProvider>
+            </TooltipProvider>
+          </HelmetProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 };
