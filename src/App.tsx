@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { HelmetProvider } from 'react-helmet-async';
 import Index from "./pages/Index";
@@ -47,10 +47,30 @@ const registerServiceWorker = async () => {
   }
 };
 
-const MobileRedirect = () => {
+// Responsive component that renders different content based on device size
+// Instead of redirecting, which can cause flickering
+const ResponsiveHome = () => {
   const isMobile = useIsMobile();
+  const [initialCheckDone, setInitialCheckDone] = useState(false);
   
-  return isMobile ? <Navigate to="/mobile" /> : <Index />;
+  // Set initial check done after first render
+  useEffect(() => {
+    if (isMobile !== undefined) {
+      setInitialCheckDone(true);
+    }
+  }, [isMobile]);
+  
+  // Show a loading state until we know the device type
+  if (!initialCheckDone) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin h-8 w-8 border-4 border-t-transparent border-meme-purple rounded-full"></div>
+      </div>
+    );
+  }
+  
+  // Render the appropriate component based on device size
+  return isMobile ? <MobileMeme /> : <Index />;
 };
 
 const App = () => {
@@ -67,7 +87,7 @@ const App = () => {
             <Sonner />
             <InstallPWA />
             <Routes>
-              <Route path="/" element={<MobileRedirect />} />
+              <Route path="/" element={<ResponsiveHome />} />
               <Route path="/mobile" element={<MobileMeme />} />
               
               {/* Meme Routes */}
