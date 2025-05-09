@@ -11,6 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import { Badge } from "@/components/ui/badge";
 import { Crown } from "lucide-react";
+import AdPlaceholder from "@/components/AdPlaceholder";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
   const [templates, setTemplates] = useState<MemeTemplate[]>([]);
@@ -21,6 +23,7 @@ const Index = () => {
   const [effect, setEffect] = useState<'none' | 'glow' | 'golden'>('none');
   const { profile } = useAuth();
   const isPro = profile?.is_pro || false;
+  const isMobile = useIsMobile();
   
   // Load templates from JSON file
   useEffect(() => {
@@ -66,6 +69,13 @@ const Index = () => {
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxjaXJjbGUgc3Ryb2tlPSIjOUI4N0Y1IiBzdHJva2Utb3BhY2l0eT0iLjAyIiBjeD0iMTAwIiBjeT0iMTAwIiByPSI5OCIvPjxwYXRoIGQ9Ik0xMDAgMmM1NiAwIDk4IDQyIDk4IDk4IDAgNTYtNDIgOTgtOTggOTgtNTQgMC05OC00NC05OC05OEMyIDQ0IDQ0IDIgMTAwIDJ6IiBzdHJva2U9IiNEOTQ2RUYiIHN0cm9rZS1vcGFjaXR5PSIuMDIiLz48L2c+PC9zdmc+')]"></div>
       
       <Header />
+
+      {/* Top Banner Ad - Desktop only */}
+      {!isMobile && (
+        <div className="container px-4 mx-auto mt-4">
+          <AdPlaceholder id="home-top-banner" className="mx-auto mb-6" />
+        </div>
+      )}
       
       <main className="container px-4 mx-auto flex-1 py-8 relative z-10">
         {loading ? (
@@ -107,14 +117,10 @@ const Index = () => {
                   onEffectChange={isPro ? setEffect : undefined}
                 />
                 
-                {/* Ad placeholder with improved design - only shown for free users */}
-                {!isPro && (
-                  <div className="mt-6 bg-gradient-to-br from-meme-darkpurple/20 to-meme-purple/10 p-5 rounded-lg border border-meme-purple/20 text-center relative overflow-hidden group hover:shadow-lg transition-all duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-r from-meme-purple/0 via-meme-pink/5 to-meme-purple/0 transform translate-x-full group-hover:translate-x-0 transition-transform duration-1000"></div>
-                    <p className="font-medium text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-                      Support MemeSmith
-                    </p>
-                    <p className="text-xs mt-1 text-muted-foreground/70">Our sponsors help keep this service free</p>
+                {/* Ad placeholder - only shown for free users */}
+                {!isPro && !isMobile && (
+                  <div className="mt-6">
+                    <AdPlaceholder id="editor-bottom-ad" format="rectangle" className="mx-auto" />
                   </div>
                 )}
               </div>

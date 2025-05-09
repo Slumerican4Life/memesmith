@@ -9,8 +9,11 @@ import Head from '@/components/Head';
 import MemeGalleryCard from '@/components/MemeGalleryCard';
 import { Button } from '@/components/ui/button';
 import { Sparkles } from 'lucide-react';
+import AdPlaceholder from '@/components/AdPlaceholder';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const ITEMS_PER_PAGE = 12;
+const AD_FREQUENCY = 8; // Show an ad after every 8 memes
 
 const fetchPublicMemes = async ({ pageParam = 0 }) => {
   const from = pageParam * ITEMS_PER_PAGE;
@@ -33,6 +36,7 @@ const fetchPublicMemes = async ({ pageParam = 0 }) => {
 };
 
 const ExploreMemes = () => {
+  const isMobile = useIsMobile();
   const {
     data,
     fetchNextPage,
@@ -48,6 +52,34 @@ const ExploreMemes = () => {
   });
 
   const allMemes = data?.pages.flatMap((page) => page.memes) || [];
+  
+  // Function to render items with ads interspersed
+  const renderMemesWithAds = () => {
+    if (allMemes.length === 0) return null;
+
+    const result = [];
+    
+    for (let i = 0; i < allMemes.length; i++) {
+      // Add the meme
+      result.push(
+        <MemeGalleryCard key={allMemes[i].id} meme={allMemes[i]} />
+      );
+      
+      // Insert ad after every AD_FREQUENCY items (desktop only)
+      if (!isMobile && (i + 1) % AD_FREQUENCY === 0 && i !== allMemes.length - 1) {
+        result.push(
+          <AdPlaceholder 
+            key={`ad-${i}`} 
+            id={`explore-ad-${Math.floor(i / AD_FREQUENCY)}`}
+            format="rectangle" 
+            className="mx-auto col-span-full my-4"
+          />
+        );
+      }
+    }
+    
+    return result;
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -87,9 +119,7 @@ const ExploreMemes = () => {
         ) : (
           <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {allMemes.map((meme) => (
-                <MemeGalleryCard key={meme.id} meme={meme} />
-              ))}
+              {renderMemesWithAds()}
             </div>
             
             {hasNextPage && (

@@ -25,7 +25,6 @@ import Privacy from "./pages/Privacy";
 import MemeDetail from "./pages/MemeDetail";
 import MyMemes from "./pages/MyMemes";
 import ExploreMemes from "./pages/ExploreMemes";
-import { TooltipProvider } from "@/components/ui/tooltip";
 
 const queryClient = new QueryClient({
   defaultOptions: {
