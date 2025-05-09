@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -141,98 +141,113 @@ const MemeDetail = () => {
       <Head 
         title={`Check out this meme from MemeSmith`}
         description="Create your own memes with MemeSmith - the web's easiest meme generator."
-        image={meme.meme_url}
+        image={meme?.meme_url}
         type="article"
       />
       
       <Header />
       
       <div className="container py-8 mx-auto">
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-card rounded-lg overflow-hidden shadow-xl border border-border">
-            {/* Meme image */}
-            <div className="flex justify-center p-4 bg-muted">
-              <img 
-                src={meme.meme_url} 
-                alt="Meme" 
-                className="max-w-full rounded shadow-sm"
-                loading="lazy"
-              />
-            </div>
-            
-            {/* Action buttons */}
-            <div className="p-4 flex flex-wrap gap-3 justify-center sm:justify-between items-center border-t border-border">
-              <div className="flex flex-wrap gap-3">
-                <Button
-                  onClick={handleCopyLink}
-                  className="flex items-center gap-2"
-                >
-                  <Share2 size={18} />
-                  Copy Link
-                </Button>
-                
-                <Button 
-                  onClick={handleShareToTwitter}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
-                  <Twitter size={18} />
-                  Share to X/Twitter
-                </Button>
-                
-                <Button 
-                  onClick={handleDownload}
-                  variant="secondary"
-                  className="flex items-center gap-2"
-                >
-                  <Download size={18} />
-                  Download
-                </Button>
-              </div>
-              
-              {isOwner && (
-                <Button 
-                  onClick={() => setShowDeleteDialog(true)}
-                  variant="destructive"
-                  className="flex items-center gap-2"
-                >
-                  <Trash2 size={18} />
-                  Delete
-                </Button>
-              )}
-            </div>
-            
-            {/* Meme details */}
-            <div className="p-4 bg-card/50 border-t border-border">
-              <div className="flex flex-col gap-3">
-                <div>
-                  <span className="text-sm font-medium text-muted-foreground">Top text:</span>
-                  <p className="text-foreground">{meme.top_text || "(none)"}</p>
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-muted-foreground">Bottom text:</span>
-                  <p className="text-foreground">{meme.bottom_text || "(none)"}</p>
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-muted-foreground">Created:</span>
-                  <p className="text-foreground">
-                    {new Date(meme.created_at).toLocaleDateString(undefined, { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
-                  </p>
-                </div>
-              </div>
-            </div>
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center">
+            <div className="animate-pulse bg-card w-full max-w-md h-64 rounded-lg"></div>
+            <div className="animate-pulse bg-card w-48 h-8 mt-4 rounded"></div>
           </div>
-          
-          <div className="mt-6 flex justify-center">
-            <Button asChild variant="outline">
-              <Link to="/">Create Another Meme</Link>
+        ) : error || !meme ? (
+          <div className="flex flex-col items-center justify-center min-h-[50vh]">
+            <h1 className="text-2xl font-bold text-foreground mb-4">Meme not found</h1>
+            <p className="text-muted-foreground mb-6">This meme doesn't exist or you don't have permission to view it.</p>
+            <Button asChild>
+              <Link to="/">Create a new meme</Link>
             </Button>
           </div>
-        </div>
+        ) : (
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-card rounded-lg overflow-hidden shadow-xl border border-border">
+              {/* Meme image */}
+              <div className="flex justify-center p-4 bg-muted">
+                <img 
+                  src={meme.meme_url} 
+                  alt="Meme" 
+                  className="max-w-full rounded shadow-sm"
+                  loading="lazy"
+                />
+              </div>
+              
+              {/* Action buttons */}
+              <div className="p-4 flex flex-wrap gap-3 justify-center sm:justify-between items-center border-t border-border">
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    onClick={handleCopyLink}
+                    className="flex items-center gap-2"
+                  >
+                    <Share2 size={18} />
+                    Copy Link
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleShareToTwitter}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <Twitter size={18} />
+                    Share to X/Twitter
+                  </Button>
+                  
+                  <Button 
+                    onClick={handleDownload}
+                    variant="secondary"
+                    className="flex items-center gap-2"
+                  >
+                    <Download size={18} />
+                    Download
+                  </Button>
+                </div>
+                
+                {isOwner && (
+                  <Button 
+                    onClick={() => setShowDeleteDialog(true)}
+                    variant="destructive"
+                    className="flex items-center gap-2"
+                  >
+                    <Trash2 size={18} />
+                    Delete
+                  </Button>
+                )}
+              </div>
+              
+              {/* Meme details */}
+              <div className="p-4 bg-card/50 border-t border-border">
+                <div className="flex flex-col gap-3">
+                  <div>
+                    <span className="text-sm font-medium text-muted-foreground">Top text:</span>
+                    <p className="text-foreground">{meme.top_text || "(none)"}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-muted-foreground">Bottom text:</span>
+                    <p className="text-foreground">{meme.bottom_text || "(none)"}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm font-medium text-muted-foreground">Created:</span>
+                    <p className="text-foreground">
+                      {new Date(meme.created_at).toLocaleDateString(undefined, { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                      })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 flex justify-center">
+              <Button asChild variant="outline">
+                <Link to="/">Create Another Meme</Link>
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
       
       <Footer />

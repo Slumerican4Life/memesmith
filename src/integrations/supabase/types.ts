@@ -9,11 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      memes: {
+        Row: {
+          bottom_text: string | null
+          created_at: string
+          id: string
+          is_public: boolean
+          likes: number
+          meme_url: string
+          template_id: string
+          template_url: string
+          top_text: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bottom_text?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          likes?: number
+          meme_url: string
+          template_id: string
+          template_url: string
+          top_text?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bottom_text?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          likes?: number
+          meme_url?: string
+          template_id?: string
+          template_url?: string
+          top_text?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       users: {
         Row: {
           created_at: string
           email: string | null
           id: string
+          is_pro: boolean | null
           losses: number
           profile_pic_url: string | null
           username: string | null
@@ -23,6 +66,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          is_pro?: boolean | null
           losses?: number
           profile_pic_url?: string | null
           username?: string | null
@@ -32,6 +76,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           id?: string
+          is_pro?: boolean | null
           losses?: number
           profile_pic_url?: string | null
           username?: string | null

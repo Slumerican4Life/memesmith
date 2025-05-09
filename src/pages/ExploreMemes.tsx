@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Meme } from '@/types/meme';
@@ -43,6 +43,7 @@ const ExploreMemes = () => {
   } = useInfiniteQuery({
     queryKey: ['publicMemes'],
     queryFn: fetchPublicMemes,
+    initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage.nextPage,
   });
 
