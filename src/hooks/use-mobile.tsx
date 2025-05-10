@@ -2,67 +2,41 @@
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
-const DEBOUNCE_DELAY = 250 // Reduced for more responsive UI while preventing too many updates
 
 export function useIsMobile(): boolean {
   const [isMobile, setIsMobile] = React.useState<boolean>(false)
-  const [initialCheckComplete, setInitialCheckComplete] = React.useState(false)
-
+  
   React.useEffect(() => {
-    // Initial check
+    // Initial check based on screen width
     const checkMobile = () => window.innerWidth < MOBILE_BREAKPOINT
+    setIsMobile(checkMobile())
     
-    // Set initial value only once
-    if (!initialCheckComplete) {
-      setIsMobile(checkMobile())
-      setInitialCheckComplete(true)
-    }
-    
-    // Use a ref to track the timeout to avoid re-renders
-    const debounceTimerRef = React.useRef<number | null>(null)
-    
-    const handleResize = () => {
-      if (debounceTimerRef.current) {
-        window.clearTimeout(debounceTimerRef.current)
-      }
-      
-      debounceTimerRef.current = window.setTimeout(() => {
-        const isMobileNow = checkMobile()
-        setIsMobile(isMobileNow)
-      }, DEBOUNCE_DELAY)
-    }
-    
-    // Use matchMedia for efficient listening
+    // Use matchMedia for efficient change detection
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     
-    // Initial check
-    setIsMobile(mql.matches)
-    
-    // Add event listener
-    const eventHandler = (e: MediaQueryListEvent) => {
+    // Simple handler without debounce for immediate UI response
+    const handleChange = (e: MediaQueryListEvent) => {
       setIsMobile(e.matches)
     }
     
-    try {
-      mql.addEventListener("change", eventHandler)
-    } catch (err) {
-      // Fallback for older browsers
-      mql.addListener(handleResize)
+    // Add event listener with compatibility fallback
+    if (mql.addEventListener) {
+      mql.addEventListener('change', handleChange)
+    } else {
+      // @ts-ignore - For older browsers
+      mql.addListener(() => setIsMobile(mql.matches))
     }
     
-    // Cleanup
+    // Clean up
     return () => {
-      try {
-        mql.removeEventListener("change", eventHandler)
-      } catch (err) {
-        mql.removeListener(handleResize)
-      }
-      
-      if (debounceTimerRef.current) {
-        window.clearTimeout(debounceTimerRef.current)
+      if (mql.removeEventListener) {
+        mql.removeEventListener('change', handleChange)
+      } else {
+        // @ts-ignore - For older browsers
+        mql.removeListener(() => setIsMobile(mql.matches))
       }
     }
-  }, [initialCheckComplete])
+  }, [])
 
   return isMobile
 }
