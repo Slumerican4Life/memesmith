@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Image, Upload, Monitor, LayoutGrid } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronLeft, Image, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import MobileUpload from '@/components/MobileUpload';
 import { MemeTemplate } from '@/types/meme';
@@ -13,13 +13,9 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import ProBadge from '@/components/ProBadge';
 import Head from '@/components/Head';
-import { useView } from '@/contexts/ViewContext';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
-// Create a memoized component for better performance
-const MobileMeme = React.memo(() => {
+const MobileMeme = () => {
   const navigate = useNavigate();
-  const { viewMode, setViewMode } = useView();
   const [customImage, setCustomImage] = useState<string | undefined>();
   const [templates, setTemplates] = useState<MemeTemplate[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<MemeTemplate | null>(null);
@@ -30,37 +26,21 @@ const MobileMeme = React.memo(() => {
   const { profile } = useAuth();
   const isPro = profile?.is_pro || false;
   
-  // Load templates from JSON file - use an effect with proper cleanup
-  useEffect(() => {
-    let isMounted = true;
-    
+  // Load templates from JSON file
+  React.useEffect(() => {
     const loadTemplates = async () => {
-      if (!isMounted) return;
-      
       try {
         const response = await fetch('/memeTemplates.json');
-        if (!response.ok) throw new Error(`Failed to load templates: ${response.status}`);
-        
         const data: MemeTemplate[] = await response.json();
-        
-        if (isMounted) {
-          setTemplates(data);
-          setLoading(false);
-        }
+        setTemplates(data);
+        setLoading(false);
       } catch (error) {
         console.error("Error loading meme templates:", error);
-        if (isMounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     };
     
     loadTemplates();
-    
-    // Cleanup function
-    return () => {
-      isMounted = false;
-    };
   }, []);
   
   const handleImageSelected = (imageData: string) => {
@@ -76,13 +56,6 @@ const MobileMeme = React.memo(() => {
   const handleBackClick = () => {
     navigate('/');
   };
-
-  // Use stable callbacks with useCallback to prevent unnecessary re-renders
-  const handleViewModeChange = React.useCallback((value: string) => {
-    if (value) {
-      setViewMode(value as 'auto' | 'mobile' | 'desktop');
-    }
-  }, [setViewMode]);
   
   // Generate dynamic meta description based on selected template
   const metaDescription = selectedTemplate 
@@ -113,27 +86,11 @@ const MobileMeme = React.memo(() => {
         <h1 className="text-center text-xl font-bold bg-gradient-to-r from-meme-purple to-meme-pink bg-clip-text text-transparent">
           MemeSmith Mobile
         </h1>
-
-        <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
-          {/* Add view toggle */}
-          <ToggleGroup 
-            type="single" 
-            value={viewMode} 
-            onValueChange={handleViewModeChange}
-            className="border border-border rounded-md"
-          >
-            <ToggleGroupItem value="auto" aria-label="Auto view" className="p-1 h-8 w-8">
-              <LayoutGrid className="h-3.5 w-3.5" />
-            </ToggleGroupItem>
-            <ToggleGroupItem value="desktop" aria-label="Desktop view" className="p-1 h-8 w-8">
-              <Monitor className="h-3.5 w-3.5" />
-            </ToggleGroupItem>
-          </ToggleGroup>
-          
-          {isPro && (
+        {isPro && (
+          <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
             <ProBadge size="sm" />
-          )}
-        </div>
+          </div>
+        )}
       </header>
       
       <main className="flex-1 p-4 overflow-y-auto">
@@ -240,9 +197,6 @@ const MobileMeme = React.memo(() => {
       </main>
     </div>
   );
-});
-
-// Give the component a display name for better debugging
-MobileMeme.displayName = 'MobileMeme';
+};
 
 export default MobileMeme;
