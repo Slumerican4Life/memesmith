@@ -2,16 +2,17 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { HelmetProvider } from 'react-helmet-async';
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ViewProvider } from "./contexts/ViewContext";
+import { ViewProvider, useView } from "./contexts/ViewContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import MobileMeme from "./pages/MobileMeme";
 import InstallPWA from "./components/InstallPWA";
+import { useIsMobile } from "./hooks/use-mobile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -48,7 +49,53 @@ const registerServiceWorker = async () => {
   }
 };
 
-function App() {
+// Responsive component that renders different content based on device size and user preference
+const ResponsiveHome = () => {
+  const { isMobile, isInitialized: isMobileInitialized } = useIsMobile();
+  const { viewMode, actualDeviceType, isInitialized: viewContextInitialized } = useView();
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Set loading to false once all initializations are complete
+  useEffect(() => {
+    if (isMobileInitialized && viewContextInitialized) {
+      // Add a small delay to ensure everything is properly initialized
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [isMobileInitialized, viewContextInitialized]);
+  
+  // Show a loading state until everything is initialized
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin h-8 w-8 border-4 border-t-transparent border-meme-purple rounded-full"></div>
+      </div>
+    );
+  }
+  
+  // Determine which view to show based on viewMode
+  let showMobileView = false;
+  
+  switch (viewMode) {
+    case 'auto':
+      // In auto mode, use the actual device type from context
+      showMobileView = actualDeviceType === 'mobile';
+      break;
+    case 'mobile':
+      showMobileView = true;
+      break;
+    case 'desktop':
+      showMobileView = false;
+      break;
+  }
+  
+  // Render the appropriate component based on the determined view
+  return showMobileView ? <MobileMeme /> : <Index />;
+};
+
+const App = () => {
   useEffect(() => {
     registerServiceWorker();
   }, []);
@@ -64,8 +111,8 @@ function App() {
                 <Sonner />
                 <InstallPWA />
                 <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/mobile" element={<MobileMeme />} />
+                  <Route path="/" element={<ResponsiveHome />} />
+                  <Route path="/mobile" element={<ResponsiveHome />} />
                   
                   {/* Meme Routes */}
                   <Route path="/memes/:id" element={<MemeDetail />} />
@@ -108,6 +155,6 @@ function App() {
       </BrowserRouter>
     </QueryClientProvider>
   );
-}
+};
 
 export default App;

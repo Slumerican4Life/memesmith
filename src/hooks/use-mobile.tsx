@@ -2,34 +2,61 @@
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
+const DEBOUNCE_DELAY = 1500 // Increased to 1500ms for better stability
 
-export function useIsMobile(): { isMobile: boolean; isInitialized: boolean } {
-  const [isMobile, setIsMobile] = React.useState<boolean>(false)
+export function useIsMobile() {
+  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
   const [isInitialized, setIsInitialized] = React.useState(false)
 
   React.useEffect(() => {
-    // Simple function to check if device is mobile based on width
+    // Initial check
     const checkMobile = () => window.innerWidth < MOBILE_BREAKPOINT
     
     // Set initial value
     setIsMobile(checkMobile())
     setIsInitialized(true)
     
-    // Add resize listener
+    // Debounced handler to prevent rapid state changes
+    let debounceTimer: number | null = null
+    
     const handleResize = () => {
-      setIsMobile(checkMobile())
+      if (debounceTimer) {
+        window.clearTimeout(debounceTimer)
+      }
+      
+      debounceTimer = window.setTimeout(() => {
+        setIsMobile(checkMobile())
+      }, DEBOUNCE_DELAY)
     }
     
-    window.addEventListener('resize', handleResize)
+    // Use matchMedia for efficient listening
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     
-    // Clean up
+    // Use the correct event listener based on browser support
+    try {
+      mql.addEventListener("change", handleResize)
+    } catch (err) {
+      // Fallback for older browsers
+      console.log("Using fallback media query listener")
+      mql.addListener(handleResize)
+    }
+    
     return () => {
-      window.removeEventListener('resize', handleResize)
+      try {
+        mql.removeEventListener("change", handleResize)
+      } catch (err) {
+        // Fallback cleanup for older browsers
+        mql.removeListener(handleResize)
+      }
+      
+      if (debounceTimer) {
+        window.clearTimeout(debounceTimer)
+      }
     }
   }, [])
 
   return {
-    isMobile,
+    isMobile: isMobile === undefined ? false : isMobile,
     isInitialized
   }
 }
