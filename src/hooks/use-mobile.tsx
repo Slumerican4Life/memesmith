@@ -4,39 +4,43 @@ import * as React from "react"
 const MOBILE_BREAKPOINT = 768
 
 export function useIsMobile(): boolean {
-  const [isMobile, setIsMobile] = React.useState<boolean>(false)
+  const [isMobile, setIsMobile] = React.useState<boolean>(() => {
+    // Server-side rendering check
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < MOBILE_BREAKPOINT;
+  });
   
   React.useEffect(() => {
-    // Initial check based on screen width
-    const checkMobile = () => window.innerWidth < MOBILE_BREAKPOINT
-    setIsMobile(checkMobile())
-    
     // Use matchMedia for efficient change detection
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
     
-    // Simple handler without debounce for immediate UI response
+    // Set initial state based on media query
+    setIsMobile(mql.matches);
+    
+    // Create a stable event handler
     const handleChange = (e: MediaQueryListEvent) => {
-      setIsMobile(e.matches)
-    }
+      setIsMobile(e.matches);
+    };
     
     // Add event listener with compatibility fallback
     if (mql.addEventListener) {
-      mql.addEventListener('change', handleChange)
+      mql.addEventListener('change', handleChange);
     } else {
       // @ts-ignore - For older browsers
-      mql.addListener(() => setIsMobile(mql.matches))
+      mql.addListener(handleChange);
     }
     
     // Clean up
     return () => {
       if (mql.removeEventListener) {
-        mql.removeEventListener('change', handleChange)
+        mql.removeEventListener('change', handleChange);
       } else {
         // @ts-ignore - For older browsers
-        mql.removeListener(() => setIsMobile(mql.matches))
+        mql.removeListener(handleChange);
       }
-    }
-  }, [])
+    };
+  }, []); // Empty dependency array to only run once on mount
 
-  return isMobile
+  // Return memoized value to prevent unnecessary re-renders
+  return React.useMemo(() => isMobile, [isMobile]);
 }
