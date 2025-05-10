@@ -2,10 +2,11 @@
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
-const DEBOUNCE_DELAY = 1000 // Increased from 300 to 1000 for better stability
+const DEBOUNCE_DELAY = 1500 // Increased to 1500ms for better stability
 
 export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+  const [isInitialized, setIsInitialized] = React.useState(false)
 
   React.useEffect(() => {
     // Initial check
@@ -13,6 +14,7 @@ export function useIsMobile() {
     
     // Set initial value
     setIsMobile(checkMobile())
+    setIsInitialized(true)
     
     // Debounced handler to prevent rapid state changes
     let debounceTimer: number | null = null
@@ -29,15 +31,32 @@ export function useIsMobile() {
     
     // Use matchMedia for efficient listening
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    mql.addEventListener("change", handleResize)
+    
+    // Use the correct event listener based on browser support
+    try {
+      mql.addEventListener("change", handleResize)
+    } catch (err) {
+      // Fallback for older browsers
+      console.log("Using fallback media query listener")
+      mql.addListener(handleResize)
+    }
     
     return () => {
-      mql.removeEventListener("change", handleResize)
+      try {
+        mql.removeEventListener("change", handleResize)
+      } catch (err) {
+        // Fallback cleanup for older browsers
+        mql.removeListener(handleResize)
+      }
+      
       if (debounceTimer) {
         window.clearTimeout(debounceTimer)
       }
     }
   }, [])
 
-  return isMobile === undefined ? false : isMobile
+  return {
+    isMobile: isMobile === undefined ? false : isMobile,
+    isInitialized
+  }
 }

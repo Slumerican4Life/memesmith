@@ -51,19 +51,23 @@ const registerServiceWorker = async () => {
 
 // Responsive component that renders different content based on device size and user preference
 const ResponsiveHome = () => {
-  const isMobile = useIsMobile();
-  const { viewMode, actualDeviceType } = useView();
-  const [initialCheckDone, setInitialCheckDone] = useState(false);
+  const { isMobile, isInitialized: isMobileInitialized } = useIsMobile();
+  const { viewMode, actualDeviceType, isInitialized: viewContextInitialized } = useView();
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Set initial check done after first render
+  // Set loading to false once all initializations are complete
   useEffect(() => {
-    if (isMobile !== undefined && actualDeviceType !== undefined) {
-      setInitialCheckDone(true);
+    if (isMobileInitialized && viewContextInitialized) {
+      // Add a small delay to ensure everything is properly initialized
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 100);
+      return () => clearTimeout(timer);
     }
-  }, [isMobile, actualDeviceType]);
+  }, [isMobileInitialized, viewContextInitialized]);
   
-  // Show a loading state until we know the device type
-  if (!initialCheckDone) {
+  // Show a loading state until everything is initialized
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin h-8 w-8 border-4 border-t-transparent border-meme-purple rounded-full"></div>
@@ -76,7 +80,7 @@ const ResponsiveHome = () => {
   
   switch (viewMode) {
     case 'auto':
-      // In auto mode, use the actual device type
+      // In auto mode, use the actual device type from context
       showMobileView = actualDeviceType === 'mobile';
       break;
     case 'mobile':
