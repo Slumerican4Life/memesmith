@@ -1,0 +1,1 @@
+# MemeSmith, A Meme generating website that is for mobile with image library and image uploading as well as multiplle categories of memes on mobile and soon to come to home computer after i figure out the stupid bug that makes it switch back and forth real fast between mobile and home versions...lol
