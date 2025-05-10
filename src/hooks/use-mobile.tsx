@@ -2,42 +2,41 @@
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
-const DEBOUNCE_DELAY = 300 // Increased from 100 to 300 for better stability
 
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
-
+export function useIsMobile(): boolean {
+  const [isMobile, setIsMobile] = React.useState<boolean>(false)
+  
   React.useEffect(() => {
-    // Initial check
+    // Initial check based on screen width
     const checkMobile = () => window.innerWidth < MOBILE_BREAKPOINT
-    
-    // Set initial value
     setIsMobile(checkMobile())
     
-    // Debounced handler to prevent rapid state changes
-    let debounceTimer: number | null = null
+    // Use matchMedia for efficient change detection
+    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     
-    const handleResize = () => {
-      if (debounceTimer) {
-        window.clearTimeout(debounceTimer)
-      }
-      
-      debounceTimer = window.setTimeout(() => {
-        setIsMobile(checkMobile())
-      }, DEBOUNCE_DELAY)
+    // Simple handler without debounce for immediate UI response
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches)
     }
     
-    // Use matchMedia for efficient listening
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    mql.addEventListener("change", handleResize)
+    // Add event listener with compatibility fallback
+    if (mql.addEventListener) {
+      mql.addEventListener('change', handleChange)
+    } else {
+      // @ts-ignore - For older browsers
+      mql.addListener(() => setIsMobile(mql.matches))
+    }
     
+    // Clean up
     return () => {
-      mql.removeEventListener("change", handleResize)
-      if (debounceTimer) {
-        window.clearTimeout(debounceTimer)
+      if (mql.removeEventListener) {
+        mql.removeEventListener('change', handleChange)
+      } else {
+        // @ts-ignore - For older browsers
+        mql.removeListener(() => setIsMobile(mql.matches))
       }
     }
   }, [])
 
-  return isMobile === undefined ? false : isMobile
+  return isMobile
 }

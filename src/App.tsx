@@ -2,16 +2,16 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { HelmetProvider } from 'react-helmet-async';
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ViewProvider } from "./contexts/ViewContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import MobileMeme from "./pages/MobileMeme";
 import InstallPWA from "./components/InstallPWA";
-import { useIsMobile } from "./hooks/use-mobile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -27,6 +27,7 @@ import MemeDetail from "./pages/MemeDetail";
 import MyMemes from "./pages/MyMemes";
 import ExploreMemes from "./pages/ExploreMemes";
 
+// Create QueryClient with stable configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -48,32 +49,7 @@ const registerServiceWorker = async () => {
   }
 };
 
-// Responsive component that renders different content based on device size
-// Instead of redirecting, which can cause flickering
-const ResponsiveHome = () => {
-  const isMobile = useIsMobile();
-  const [initialCheckDone, setInitialCheckDone] = useState(false);
-  
-  // Set initial check done after first render
-  useEffect(() => {
-    if (isMobile !== undefined) {
-      setInitialCheckDone(true);
-    }
-  }, [isMobile]);
-  
-  // Show a loading state until we know the device type
-  if (!initialCheckDone) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin h-8 w-8 border-4 border-t-transparent border-meme-purple rounded-full"></div>
-      </div>
-    );
-  }
-  
-  // Render the appropriate component based on device size
-  return isMobile ? <MobileMeme /> : <Index />;
-};
-
+// Simplified component without unnecessary state
 const App = () => {
   useEffect(() => {
     registerServiceWorker();
@@ -84,49 +60,51 @@ const App = () => {
       <BrowserRouter>
         <TooltipProvider>
           <AuthProvider>
-            <HelmetProvider>
-              <Toaster />
-              <Sonner />
-              <InstallPWA />
-              <Routes>
-                <Route path="/" element={<ResponsiveHome />} />
-                <Route path="/mobile" element={<ResponsiveHome />} />
-                
-                {/* Meme Routes */}
-                <Route path="/memes/:id" element={<MemeDetail />} />
-                <Route path="/my-memes" element={
-                  <ProtectedRoute>
-                    <MyMemes />
-                  </ProtectedRoute>
-                } />
-                <Route path="/explore" element={<ExploreMemes />} />
-                
-                {/* Auth Routes */}
-                <Route path="/auth/login" element={<Login />} />
-                <Route path="/auth/register" element={<Register />} />
-                <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-                <Route path="/auth/update-password" element={<UpdatePassword />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
-                
-                {/* Protected Routes */}
-                <Route path="/profile" element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                } />
-                
-                {/* Pro Upgrade Routes */}
-                <Route path="/upgrade" element={<ProUpgrade />} />
-                <Route path="/upgrade-success" element={<UpgradeSuccess />} />
-                
-                {/* Legal Routes */}
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/privacy" element={<Privacy />} />
-                
-                {/* Catch-all 404 route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </HelmetProvider>
+            <ViewProvider>
+              <HelmetProvider>
+                <Toaster />
+                <Sonner />
+                <InstallPWA />
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/mobile" element={<MobileMeme />} />
+                  
+                  {/* Meme Routes */}
+                  <Route path="/memes/:id" element={<MemeDetail />} />
+                  <Route path="/my-memes" element={
+                    <ProtectedRoute>
+                      <MyMemes />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/explore" element={<ExploreMemes />} />
+                  
+                  {/* Auth Routes */}
+                  <Route path="/auth/login" element={<Login />} />
+                  <Route path="/auth/register" element={<Register />} />
+                  <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/auth/update-password" element={<UpdatePassword />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
+                  
+                  {/* Protected Routes */}
+                  <Route path="/profile" element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Pro Upgrade Routes */}
+                  <Route path="/upgrade" element={<ProUpgrade />} />
+                  <Route path="/upgrade-success" element={<UpgradeSuccess />} />
+                  
+                  {/* Legal Routes */}
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  
+                  {/* Catch-all 404 route */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </HelmetProvider>
+            </ViewProvider>
           </AuthProvider>
         </TooltipProvider>
       </BrowserRouter>
