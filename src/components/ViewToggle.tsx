@@ -1,44 +1,21 @@
 
 import React from 'react';
-import { Monitor, Smartphone } from "lucide-react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Smartphone } from "lucide-react";
 import { useView } from '@/contexts/ViewContext';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
+// This component is simplified to just show the mobile icon with no toggle functionality
 const ViewToggle = () => {
-  const { viewMode, setViewMode, isInitialized } = useView();
+  const { isInitialized } = useView();
   
-  if (!isInitialized) return null; // Don't render until initialized
+  if (!isInitialized) return null;
   
   return (
-    <ToggleGroup 
-      type="single" 
-      value={viewMode} 
-      onValueChange={(value) => value && setViewMode(value as 'mobile' | 'desktop')}
-      className="border border-border rounded-md"
-    >
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <ToggleGroupItem value="mobile" aria-label="Mobile view" className="px-2 data-[state=on]:bg-meme-purple/20">
-            <Smartphone className="h-4 w-4" />
-          </ToggleGroupItem>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Mobile view</p>
-        </TooltipContent>
-      </Tooltip>
-      
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <ToggleGroupItem value="desktop" aria-label="Desktop view" className="px-2 data-[state=on]:bg-meme-purple/20">
-            <Monitor className="h-4 w-4" />
-          </ToggleGroupItem>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Desktop view</p>
-        </TooltipContent>
-      </Tooltip>
-    </ToggleGroup>
+    <div className="flex items-center justify-center gap-2 px-2 py-1 border border-border rounded-md bg-meme-purple/10">
+      <div className="flex items-center gap-1">
+        <Smartphone className="h-4 w-4" />
+        <span className="text-xs font-medium">Mobile</span>
+      </div>
+    </div>
   );
 };
 

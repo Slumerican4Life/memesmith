@@ -1,6 +1,6 @@
+import React, { createContext, useState, useContext } from 'react';
 
-import React, { createContext, useState, useContext, useEffect } from 'react';
-
+// We're only using mobile for now, but keeping the type for future expansion
 type ViewMode = 'mobile' | 'desktop';
 
 interface ViewContextType {
@@ -12,29 +12,15 @@ interface ViewContextType {
 const ViewContext = createContext<ViewContextType | undefined>(undefined);
 
 export function ViewProvider({ children }: { children: React.ReactNode }) {
-  // Initialize with 'mobile' as default - we're strictly starting with mobile
-  const [viewMode, setViewModeState] = useState<ViewMode>('mobile');
-  const [isInitialized, setIsInitialized] = useState(false);
+  // Always enforce mobile mode - no switching allowed for now
+  const [viewMode] = useState<ViewMode>('mobile');
+  const [isInitialized] = useState(true);
   
-  // On mount - load saved preference from localStorage if available
-  useEffect(() => {
-    const savedViewMode = localStorage.getItem('viewMode') as ViewMode;
-    if (savedViewMode && ['mobile', 'desktop'].includes(savedViewMode)) {
-      setViewModeState(savedViewMode);
-    }
-    
-    setIsInitialized(true);
-  }, []);
-  
-  // Save preference to localStorage whenever it changes
-  useEffect(() => {
-    if (viewMode) {
-      localStorage.setItem('viewMode', viewMode);
-    }
-  }, [viewMode]);
-  
-  const setViewMode = (mode: ViewMode) => {
-    setViewModeState(mode);
+  // This is just a placeholder function that does nothing
+  // We'll implement real functionality when desktop mode is added later
+  const setViewMode = () => {
+    // Do nothing - mobile only for now
+    console.log("Desktop mode not available yet");
   };
   
   const contextValue = React.useMemo(() => ({
