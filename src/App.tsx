@@ -2,8 +2,8 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { HelmetProvider } from 'react-helmet-async';
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -48,31 +48,9 @@ const registerServiceWorker = async () => {
   }
 };
 
-// Responsive component that renders different content based on device size and user preference
+// Simplified responsive component that just renders Index
 const ResponsiveHome = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
-  
-  // Set loading to false once all initializations are complete
-  useEffect(() => {
-    setMounted(true);
-    // Add a small delay to ensure everything is properly initialized
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-  
-  // Show a loading state until everything is initialized
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin h-8 w-8 border-4 border-t-transparent border-meme-purple rounded-full"></div>
-      </div>
-    );
-  }
-  
-  return mounted ? <Index /> : null;
+  return <Index />;
 };
 
 const App = () => {

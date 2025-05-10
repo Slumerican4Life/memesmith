@@ -2,21 +2,21 @@
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
-const DEBOUNCE_DELAY = 1500 // Increased to 1500ms for better stability
+const DEBOUNCE_DELAY = 100 // Reduced debounce delay for faster response
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+  const [isMobile, setIsMobile] = React.useState<boolean>(false)
   const [isInitialized, setIsInitialized] = React.useState(false)
 
   React.useEffect(() => {
-    // Initial check
+    // Simple check function
     const checkMobile = () => window.innerWidth < MOBILE_BREAKPOINT
     
-    // Set initial value
+    // Set initial value immediately
     setIsMobile(checkMobile())
     setIsInitialized(true)
     
-    // Debounced handler to prevent rapid state changes
+    // Debounced handler for resize
     let debounceTimer: number | null = null
     
     const handleResize = () => {
@@ -29,26 +29,11 @@ export function useIsMobile() {
       }, DEBOUNCE_DELAY)
     }
     
-    // Use matchMedia for efficient listening
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    
-    // Use the correct event listener based on browser support
-    try {
-      mql.addEventListener("change", handleResize)
-    } catch (err) {
-      // Fallback for older browsers
-      console.log("Using fallback media query listener")
-      mql.addListener(handleResize)
-    }
+    // Add standard resize event listener
+    window.addEventListener('resize', handleResize)
     
     return () => {
-      try {
-        mql.removeEventListener("change", handleResize)
-      } catch (err) {
-        // Fallback cleanup for older browsers
-        mql.removeListener(handleResize)
-      }
-      
+      window.removeEventListener('resize', handleResize)
       if (debounceTimer) {
         window.clearTimeout(debounceTimer)
       }
@@ -56,7 +41,7 @@ export function useIsMobile() {
   }, [])
 
   return {
-    isMobile: isMobile === undefined ? false : isMobile,
+    isMobile,
     isInitialized
   }
 }

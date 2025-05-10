@@ -1,12 +1,13 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 type ViewMode = 'auto' | 'mobile' | 'desktop';
 
 interface ViewContextType {
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
-  actualDeviceType: 'mobile' | 'desktop' | undefined;
+  actualDeviceType: 'mobile' | 'desktop';
   isInitialized: boolean;
 }
 
@@ -14,43 +15,16 @@ const ViewContext = createContext<ViewContextType | undefined>(undefined);
 
 export function ViewProvider({ children }: { children: React.ReactNode }) {
   const [viewMode, setViewModeState] = useState<ViewMode>('auto');
-  const [actualDeviceType, setActualDeviceType] = useState<'mobile' | 'desktop' | undefined>(undefined);
+  const { isMobile, isInitialized: isMobileInitialized } = useIsMobile();
   const [isInitialized, setIsInitialized] = useState(false);
   
-  // Detect actual device type on mount using User-Agent and screen size
   useEffect(() => {
-    const detectDeviceType = () => {
-      // Check for mobile user agent patterns
-      const userAgent = navigator.userAgent || navigator.vendor;
-      const isMobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-      
-      // Check screen width
-      const isMobileScreen = window.innerWidth < 768;
-      
-      // Check for touch capability as additional signal
-      const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      
-      // Combine signals - if 2 out of 3 suggest mobile, treat as mobile
-      const mobileSignals = [isMobileUserAgent, isMobileScreen, hasTouch].filter(Boolean).length;
-      const isMobile = mobileSignals >= 2;
-      
-      return isMobile ? 'mobile' : 'desktop';
-    };
-
-    // Set the actual device type
-    const detectedType = detectDeviceType();
-    setActualDeviceType(detectedType);
-    
     // Load saved preference from localStorage if available
     const savedViewMode = localStorage.getItem('viewMode') as ViewMode;
     if (savedViewMode && ['auto', 'mobile', 'desktop'].includes(savedViewMode)) {
       setViewModeState(savedViewMode);
-    } else {
-      // If no saved preference, start with auto
-      setViewModeState('auto');
     }
     
-    // Mark initialization as complete
     setIsInitialized(true);
   }, []);
   
@@ -65,8 +39,16 @@ export function ViewProvider({ children }: { children: React.ReactNode }) {
     setViewModeState(mode);
   };
   
+  // Determine actual device type based on the isMobile hook
+  const actualDeviceType = isMobile ? 'mobile' : 'desktop';
+  
   return (
-    <ViewContext.Provider value={{ viewMode, setViewMode, actualDeviceType, isInitialized }}>
+    <ViewContext.Provider value={{ 
+      viewMode, 
+      setViewMode, 
+      actualDeviceType, 
+      isInitialized: isInitialized && isMobileInitialized 
+    }}>
       {children}
     </ViewContext.Provider>
   );

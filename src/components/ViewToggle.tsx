@@ -8,13 +8,17 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 const ViewToggle = () => {
   const { viewMode, setViewMode, isInitialized } = useView();
   
-  if (!isInitialized) return null; // Don't render until initialized
+  if (!isInitialized) {
+    return null; // Don't render until initialized
+  }
   
   return (
     <ToggleGroup 
       type="single" 
       value={viewMode} 
-      onValueChange={(value) => value && setViewMode(value as 'auto' | 'mobile' | 'desktop')}
+      onValueChange={(value) => {
+        if (value) setViewMode(value as 'auto' | 'mobile' | 'desktop');
+      }}
       className="border border-border rounded-md"
     >
       <Tooltip>
