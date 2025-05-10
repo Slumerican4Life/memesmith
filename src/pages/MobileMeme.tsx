@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, Image, Upload, Monitor, LayoutGrid } from 'lucide-react';
+import { ChevronLeft, Image, Upload, Monitor, LayoutGrid, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import MobileUpload from '@/components/MobileUpload';
 import { MemeTemplate } from '@/types/meme';

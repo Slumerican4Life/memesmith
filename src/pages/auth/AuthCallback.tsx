@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
 import { supabase } from '@/integrations/supabase/client';
 
 const AuthCallback = () => {
@@ -21,26 +21,23 @@ const AuthCallback = () => {
         
         if (data?.session) {
           // Success - redirect to home page
-          toast({
-            title: "Authentication successful",
-            description: "You've been successfully signed in.",
+          toast("Authentication successful", {
+            description: "You've been successfully signed in."
           });
           navigate('/', { replace: true });
         } else {
           // No session found - redirect to login page
-          toast({
-            variant: "destructive",
-            title: "Authentication failed",
+          toast("Authentication failed", {
             description: "Unable to complete sign in. Please try again.",
+            variant: "destructive"
           });
           navigate('/auth/login', { replace: true });
         }
       } catch (error: any) {
         console.error('Error during OAuth callback:', error);
-        toast({
-          variant: "destructive",
-          title: "Authentication failed",
-          description: error.message || "An error occurred during authentication. Please try again.",
+        toast("Authentication failed", {
+            description: error.message || "An error occurred during authentication. Please try again.",
+            variant: "destructive"
         });
         navigate('/auth/login', { replace: true });
       }

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader2, CreditCard, CheckCircle2, XCircle, Star, Zap } from 'lucide-react';
@@ -69,19 +68,16 @@ const ProUpgrade = () => {
   
   const handleUpgrade = async (planType) => {
     if (!user) {
-      toast({
-        title: "Authentication required",
-        description: "Please sign in to upgrade to Pro.",
-        variant: "destructive"
+      toast("Authentication required", {
+        description: "Please sign in to upgrade to Pro."
       });
       navigate('/auth/login');
       return;
     }
     
     if (profile?.is_pro) {
-      toast({
-        title: "Already a Pro member",
-        description: "You already have Pro access!",
+      toast("Already a Pro member", {
+        description: "You already have Pro access!"
       });
       return;
     }
@@ -120,10 +116,8 @@ const ProUpgrade = () => {
       }
     } catch (error) {
       console.error('Error creating checkout session:', error);
-      toast({
-        title: "Checkout Failed",
-        description: "There was a problem starting the checkout process. Please try again.",
-        variant: "destructive"
+      toast("Checkout Failed", {
+        description: "There was a problem starting the checkout process. Please try again."
       });
       setIsLoading(false);
     }
