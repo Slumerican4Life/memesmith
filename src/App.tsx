@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { HelmetProvider } from 'react-helmet-async';
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -50,16 +50,15 @@ const registerServiceWorker = async () => {
 
 // Responsive component that renders different content based on device size and user preference
 const ResponsiveHome = () => {
+  // Use a single state for loading to avoid flickering
   const [isLoading, setIsLoading] = useState(true);
-  const [mounted, setMounted] = useState(false);
   
   // Set loading to false once all initializations are complete
   useEffect(() => {
-    setMounted(true);
     // Add a small delay to ensure everything is properly initialized
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 100);
+    }, 300);
     return () => clearTimeout(timer);
   }, []);
   
@@ -72,7 +71,7 @@ const ResponsiveHome = () => {
     );
   }
   
-  return mounted ? <Index /> : null;
+  return <Index />;
 };
 
 const App = () => {
@@ -80,7 +79,8 @@ const App = () => {
     registerServiceWorker();
   }, []);
 
-  return (
+  // Prevent multiple renders to improve performance
+  const memoizedApp = useMemo(() => (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <TooltipProvider>
@@ -134,7 +134,9 @@ const App = () => {
         </TooltipProvider>
       </BrowserRouter>
     </QueryClientProvider>
-  );
+  ), []);
+
+  return memoizedApp;
 };
 
 export default App;

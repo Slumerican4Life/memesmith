@@ -2,56 +2,67 @@
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
-const DEBOUNCE_DELAY = 1500 // Increased to 1500ms for better stability
+const DEBOUNCE_DELAY = 250 // Reduced for more responsive UI while preventing too many updates
 
 export function useIsMobile(): boolean {
   const [isMobile, setIsMobile] = React.useState<boolean>(false)
+  const [initialCheckComplete, setInitialCheckComplete] = React.useState(false)
 
   React.useEffect(() => {
     // Initial check
     const checkMobile = () => window.innerWidth < MOBILE_BREAKPOINT
     
-    // Set initial value
-    setIsMobile(checkMobile())
+    // Set initial value only once
+    if (!initialCheckComplete) {
+      setIsMobile(checkMobile())
+      setInitialCheckComplete(true)
+    }
     
-    // Debounced handler to prevent rapid state changes
-    let debounceTimer: number | null = null
+    // Use a ref to track the timeout to avoid re-renders
+    const debounceTimerRef = React.useRef<number | null>(null)
     
     const handleResize = () => {
-      if (debounceTimer) {
-        window.clearTimeout(debounceTimer)
+      if (debounceTimerRef.current) {
+        window.clearTimeout(debounceTimerRef.current)
       }
       
-      debounceTimer = window.setTimeout(() => {
-        setIsMobile(checkMobile())
+      debounceTimerRef.current = window.setTimeout(() => {
+        const isMobileNow = checkMobile()
+        setIsMobile(isMobileNow)
       }, DEBOUNCE_DELAY)
     }
     
     // Use matchMedia for efficient listening
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     
-    // Use the correct event listener based on browser support
+    // Initial check
+    setIsMobile(mql.matches)
+    
+    // Add event listener
+    const eventHandler = (e: MediaQueryListEvent) => {
+      setIsMobile(e.matches)
+    }
+    
     try {
-      mql.addEventListener("change", handleResize)
+      mql.addEventListener("change", eventHandler)
     } catch (err) {
       // Fallback for older browsers
-      console.log("Using fallback media query listener")
       mql.addListener(handleResize)
     }
     
+    // Cleanup
     return () => {
       try {
-        mql.removeEventListener("change", handleResize)
+        mql.removeEventListener("change", eventHandler)
       } catch (err) {
-        // Fallback cleanup for older browsers
         mql.removeListener(handleResize)
       }
       
-      if (debounceTimer) {
-        window.clearTimeout(debounceTimer)
+      if (debounceTimerRef.current) {
+        window.clearTimeout(debounceTimerRef.current)
       }
     }
-  }, [])
+  }, [initialCheckComplete])
 
   return isMobile
 }
