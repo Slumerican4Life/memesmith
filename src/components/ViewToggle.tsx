@@ -8,8 +8,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 const ViewToggle = () => {
   const { viewMode, setViewMode, isInitialized } = useView();
   
+  // Don't render anything until fully initialized
   if (!isInitialized) {
-    return null; // Don't render until initialized
+    return null;
   }
   
   return (

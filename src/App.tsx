@@ -48,12 +48,7 @@ const registerServiceWorker = async () => {
   }
 };
 
-// Simplified responsive component that just renders Index
-const ResponsiveHome = () => {
-  return <Index />;
-};
-
-const App = () => {
+function App() {
   useEffect(() => {
     registerServiceWorker();
   }, []);
@@ -69,7 +64,7 @@ const App = () => {
                 <Sonner />
                 <InstallPWA />
                 <Routes>
-                  <Route path="/" element={<ResponsiveHome />} />
+                  <Route path="/" element={<Index />} />
                   <Route path="/mobile" element={<MobileMeme />} />
                   
                   {/* Meme Routes */}
@@ -113,6 +108,6 @@ const App = () => {
       </BrowserRouter>
     </QueryClientProvider>
   );
-};
+}
 
 export default App;
