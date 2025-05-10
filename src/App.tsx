@@ -7,12 +7,11 @@ import { useEffect, useState } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { HelmetProvider } from 'react-helmet-async';
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ViewProvider, useView } from "./contexts/ViewContext";
+import { ViewProvider } from "./contexts/ViewContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import MobileMeme from "./pages/MobileMeme";
 import InstallPWA from "./components/InstallPWA";
-import { useIsMobile } from "./hooks/use-mobile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -51,20 +50,18 @@ const registerServiceWorker = async () => {
 
 // Responsive component that renders different content based on device size and user preference
 const ResponsiveHome = () => {
-  const { isMobile, isInitialized: isMobileInitialized } = useIsMobile();
-  const { viewMode, actualDeviceType, isInitialized: viewContextInitialized } = useView();
   const [isLoading, setIsLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   
   // Set loading to false once all initializations are complete
   useEffect(() => {
-    if (isMobileInitialized && viewContextInitialized) {
-      // Add a small delay to ensure everything is properly initialized
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 100);
-      return () => clearTimeout(timer);
-    }
-  }, [isMobileInitialized, viewContextInitialized]);
+    setMounted(true);
+    // Add a small delay to ensure everything is properly initialized
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
   
   // Show a loading state until everything is initialized
   if (isLoading) {
@@ -75,24 +72,7 @@ const ResponsiveHome = () => {
     );
   }
   
-  // Determine which view to show based on viewMode
-  let showMobileView = false;
-  
-  switch (viewMode) {
-    case 'auto':
-      // In auto mode, use the actual device type from context
-      showMobileView = actualDeviceType === 'mobile';
-      break;
-    case 'mobile':
-      showMobileView = true;
-      break;
-    case 'desktop':
-      showMobileView = false;
-      break;
-  }
-  
-  // Render the appropriate component based on the determined view
-  return showMobileView ? <MobileMeme /> : <Index />;
+  return mounted ? <Index /> : null;
 };
 
 const App = () => {
@@ -112,7 +92,7 @@ const App = () => {
                 <InstallPWA />
                 <Routes>
                   <Route path="/" element={<ResponsiveHome />} />
-                  <Route path="/mobile" element={<ResponsiveHome />} />
+                  <Route path="/mobile" element={<MobileMeme />} />
                   
                   {/* Meme Routes */}
                   <Route path="/memes/:id" element={<MemeDetail />} />
