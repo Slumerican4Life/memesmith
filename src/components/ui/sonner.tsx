@@ -4,10 +4,9 @@ import { Toaster as Sonner } from "sonner"
 type ToasterProps = React.ComponentProps<typeof Sonner>
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  // Remove dependency on next-themes
   return (
     <Sonner
-      theme="system"
+      theme="light"
       className="toaster group"
       toastOptions={{
         classNames: {
@@ -25,4 +24,5 @@ const Toaster = ({ ...props }: ToasterProps) => {
   )
 }
 
-export { Toaster, toast } from "sonner"
+export { Toaster }
+export { toast } from "sonner"
