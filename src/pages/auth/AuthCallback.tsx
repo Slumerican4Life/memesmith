@@ -29,7 +29,8 @@ const AuthCallback = () => {
           // No session found - redirect to login page
           toast("Authentication failed", {
             description: "Unable to complete sign in. Please try again.",
-            variant: "destructive"
+            // Using correct toast property
+            style: { backgroundColor: 'hsl(var(--destructive))' }
           });
           navigate('/auth/login', { replace: true });
         }
@@ -37,7 +38,8 @@ const AuthCallback = () => {
         console.error('Error during OAuth callback:', error);
         toast("Authentication failed", {
             description: error.message || "An error occurred during authentication. Please try again.",
-            variant: "destructive"
+            // Using correct toast property
+            style: { backgroundColor: 'hsl(var(--destructive))' }
         });
         navigate('/auth/login', { replace: true });
       }

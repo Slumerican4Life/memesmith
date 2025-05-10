@@ -12,7 +12,8 @@ interface ViewContextType {
 const ViewContext = createContext<ViewContextType | undefined>(undefined);
 
 export function ViewProvider({ children }: { children: React.ReactNode }) {
-  const [viewMode, setViewModeState] = useState<ViewMode>('desktop');
+  // Initialize with 'mobile' as default - we're strictly starting with mobile
+  const [viewMode, setViewModeState] = useState<ViewMode>('mobile');
   const [isInitialized, setIsInitialized] = useState(false);
   
   // On mount - load saved preference from localStorage if available
@@ -36,7 +37,6 @@ export function ViewProvider({ children }: { children: React.ReactNode }) {
     setViewModeState(mode);
   };
   
-  // Create a stable context value with React.useMemo to prevent unnecessary re-renders
   const contextValue = React.useMemo(() => ({
     viewMode,
     setViewMode,
