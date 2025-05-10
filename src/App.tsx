@@ -11,7 +11,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ViewProvider } from "./contexts/ViewContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import MobileMeme from "./pages/MobileMeme";
 import InstallPWA from "./components/InstallPWA";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/auth/Login";
@@ -57,61 +56,58 @@ const App = () => {
   }, []);
 
   return (
-    <React.StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <TooltipProvider>
-            <AuthProvider>
-              <ViewProvider>
-                <HelmetProvider>
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/mobile" element={<MobileMeme />} />
-                    
-                    {/* Meme Routes */}
-                    <Route path="/memes/:id" element={<MemeDetail />} />
-                    <Route path="/my-memes" element={
-                      <ProtectedRoute>
-                        <MyMemes />
-                      </ProtectedRoute>
-                    } />
-                    <Route path="/explore" element={<ExploreMemes />} />
-                    
-                    {/* Auth Routes */}
-                    <Route path="/auth/login" element={<Login />} />
-                    <Route path="/auth/register" element={<Register />} />
-                    <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/auth/update-password" element={<UpdatePassword />} />
-                    <Route path="/auth/callback" element={<AuthCallback />} />
-                    
-                    {/* Protected Routes */}
-                    <Route path="/profile" element={
-                      <ProtectedRoute>
-                        <Profile />
-                      </ProtectedRoute>
-                    } />
-                    
-                    {/* Pro Upgrade Routes */}
-                    <Route path="/upgrade" element={<ProUpgrade />} />
-                    <Route path="/upgrade-success" element={<UpgradeSuccess />} />
-                    
-                    {/* Legal Routes */}
-                    <Route path="/terms" element={<Terms />} />
-                    <Route path="/privacy" element={<Privacy />} />
-                    
-                    {/* Catch-all 404 route */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                  <Toaster />
-                  <Sonner />
-                  <InstallPWA />
-                </HelmetProvider>
-              </ViewProvider>
-            </AuthProvider>
-          </TooltipProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    </React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <TooltipProvider>
+          <AuthProvider>
+            <ViewProvider>
+              <HelmetProvider>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  
+                  {/* Meme Routes */}
+                  <Route path="/memes/:id" element={<MemeDetail />} />
+                  <Route path="/my-memes" element={
+                    <ProtectedRoute>
+                      <MyMemes />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/explore" element={<ExploreMemes />} />
+                  
+                  {/* Auth Routes */}
+                  <Route path="/auth/login" element={<Login />} />
+                  <Route path="/auth/register" element={<Register />} />
+                  <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/auth/update-password" element={<UpdatePassword />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
+                  
+                  {/* Protected Routes */}
+                  <Route path="/profile" element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Pro Upgrade Routes */}
+                  <Route path="/upgrade" element={<ProUpgrade />} />
+                  <Route path="/upgrade-success" element={<UpgradeSuccess />} />
+                  
+                  {/* Legal Routes */}
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  
+                  {/* Catch-all 404 route */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <Toaster />
+                <Sonner />
+                <InstallPWA />
+              </HelmetProvider>
+            </ViewProvider>
+          </AuthProvider>
+        </TooltipProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };
 

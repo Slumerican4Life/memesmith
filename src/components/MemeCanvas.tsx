@@ -35,6 +35,17 @@ const MemeCanvas: React.FC<MemeCanvasProps> = ({
     canvas.width = width;
     canvas.height = height;
     
+    // Only proceed if we have an image to draw
+    if (!selectedTemplate && !customImage) {
+      ctx.fillStyle = '#1A1F2C'; // Dark background
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = '#9b87f5'; // Purple text
+      ctx.textAlign = 'center';
+      ctx.font = '20px Arial, sans-serif';
+      ctx.fillText('Select a template or upload an image', width / 2, height / 2);
+      return;
+    }
+    
     // Load image
     const img = new Image();
     img.crossOrigin = "anonymous"; // Enable cross-origin loading

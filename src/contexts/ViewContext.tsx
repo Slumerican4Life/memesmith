@@ -1,30 +1,24 @@
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useIsMobile } from '@/hooks/use-mobile';
 
-type ViewMode = 'auto' | 'mobile' | 'desktop';
+type ViewMode = 'mobile' | 'desktop';
 
 interface ViewContextType {
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
-  actualDeviceType: 'mobile' | 'desktop';
   isInitialized: boolean;
 }
 
 const ViewContext = createContext<ViewContextType | undefined>(undefined);
 
 export function ViewProvider({ children }: { children: React.ReactNode }) {
-  const [viewMode, setViewModeState] = useState<ViewMode>('auto');
+  const [viewMode, setViewModeState] = useState<ViewMode>('desktop');
   const [isInitialized, setIsInitialized] = useState(false);
-  
-  // Use our simplified hook for mobile detection
-  const isMobile = useIsMobile();
-  const actualDeviceType = isMobile ? 'mobile' as const : 'desktop' as const;
   
   // On mount - load saved preference from localStorage if available
   useEffect(() => {
     const savedViewMode = localStorage.getItem('viewMode') as ViewMode;
-    if (savedViewMode && ['auto', 'mobile', 'desktop'].includes(savedViewMode)) {
+    if (savedViewMode && ['mobile', 'desktop'].includes(savedViewMode)) {
       setViewModeState(savedViewMode);
     }
     
@@ -46,9 +40,8 @@ export function ViewProvider({ children }: { children: React.ReactNode }) {
   const contextValue = React.useMemo(() => ({
     viewMode,
     setViewMode,
-    actualDeviceType,
     isInitialized
-  }), [viewMode, actualDeviceType, isInitialized]);
+  }), [viewMode, isInitialized]);
   
   return (
     <ViewContext.Provider value={contextValue}>
