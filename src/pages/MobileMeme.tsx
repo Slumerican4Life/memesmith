@@ -79,8 +79,10 @@ const MobileMeme = React.memo(() => {
 
   // Use stable callbacks with useCallback to prevent unnecessary re-renders
   const handleViewModeChange = React.useCallback((value: string) => {
-    if (value) {
-      setViewMode(value as 'auto' | 'mobile' | 'desktop');
+    if (value === 'desktop') {
+      setViewMode('desktop');
+    } else if (value === 'mobile') {
+      setViewMode('mobile');
     }
   }, [setViewMode]);
   
@@ -115,15 +117,15 @@ const MobileMeme = React.memo(() => {
         </h1>
 
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
-          {/* Add view toggle */}
+          {/* Modified view toggle to only use desktop/mobile options */}
           <ToggleGroup 
             type="single" 
             value={viewMode} 
             onValueChange={handleViewModeChange}
             className="border border-border rounded-md"
           >
-            <ToggleGroupItem value="auto" aria-label="Auto view" className="p-1 h-8 w-8">
-              <LayoutGrid className="h-3.5 w-3.5" />
+            <ToggleGroupItem value="mobile" aria-label="Mobile view" className="p-1 h-8 w-8">
+              <Smartphone className="h-3.5 w-3.5" />
             </ToggleGroupItem>
             <ToggleGroupItem value="desktop" aria-label="Desktop view" className="p-1 h-8 w-8">
               <Monitor className="h-3.5 w-3.5" />

@@ -48,6 +48,7 @@ exports.handler = async (event) => {
       
       // Get the userId from the client_reference_id
       const userId = session.client_reference_id;
+      const planType = session.metadata?.planType;
       
       if (!userId) {
         logStep("No userId found in session metadata");
@@ -57,22 +58,61 @@ exports.handler = async (event) => {
         };
       }
       
-      logStep("Updating user profile", { userId });
-      // Update the user's profile to set is_pro to true
-      const { error } = await supabase
-        .from('users')
-        .update({ is_pro: true })
-        .eq('id', userId);
+      logStep("Updating user profile", { userId, planType });
       
-      if (error) {
-        logStep("Error updating user profile", { error });
-        return {
-          statusCode: 500,
-          body: JSON.stringify({ error: 'Error updating user profile' }),
-        };
+      // Different handling based on plan type
+      if (planType === 'monthly' || planType === 'lifetime') {
+        // For monthly or lifetime plans, set user as Pro
+        const { error } = await supabase
+          .from('users')
+          .update({ is_pro: true })
+          .eq('id', userId);
+        
+        if (error) {
+          logStep("Error updating user profile", { error });
+          return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Error updating user profile' }),
+          };
+        }
+        
+        logStep(`Successfully upgraded user ${userId} to Pro with ${planType} plan!`);
+      } else if (planType === 'paymeme') {
+        // For pay-per-meme plan, we'd add credits to the user
+        // First check if the user has a credits field, if not add it
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id, meme_credits')
+          .eq('id', userId)
+          .single();
+        
+        if (userError) {
+          logStep("Error fetching user data", { error: userError });
+          return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Error fetching user data' }),
+          };
+        }
+        
+        // Default to 10 credits (for $5 at $0.50 per meme)
+        const currentCredits = userData.meme_credits || 0;
+        const newCredits = currentCredits + 10; // Add 10 credits
+        
+        const { error } = await supabase
+          .from('users')
+          .update({ meme_credits: newCredits })
+          .eq('id', userId);
+        
+        if (error) {
+          logStep("Error updating user credits", { error });
+          return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Error updating user credits' }),
+          };
+        }
+        
+        logStep(`Successfully added 10 credits to user ${userId}, new total: ${newCredits}`);
       }
-      
-      logStep(`Successfully upgraded user ${userId} to Pro!`);
     }
     
     return {

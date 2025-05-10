@@ -43,7 +43,7 @@ exports.handler = async (event, context) => {
     
     logStep('Processing checkout request');
     // Parse the request body
-    const { userId, returnUrl } = JSON.parse(event.body);
+    const { userId, returnUrl, planType, amount, planName } = JSON.parse(event.body);
     
     if (!userId) {
       logStep('Missing userId');
@@ -54,34 +54,76 @@ exports.handler = async (event, context) => {
       };
     }
     
-    logStep('Creating Stripe session', { userId });
-    // Create a Stripe Checkout Session
+    logStep('Creating Stripe session', { userId, planType, planName });
+    
+    // Determine the payment mode based on plan type
+    const mode = planType === 'monthly' ? 'subscription' : 'payment';
+    
+    let lineItems = [];
+    
+    if (planType === 'monthly') {
+      // Monthly subscription
+      lineItems = [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'MemeSmith Pro Monthly',
+            description: 'Monthly subscription to MemeSmith Pro',
+            images: ['https://btbifnkqslcleqyxptec.supabase.co/storage/v1/object/public/memesmith/pro-pack.jpg'],
+          },
+          unit_amount: 999, // $9.99
+          recurring: {
+            interval: 'month',
+          },
+        },
+        quantity: 1,
+      }];
+    } else if (planType === 'lifetime') {
+      // Lifetime purchase
+      lineItems = [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'MemeSmith Pro Lifetime',
+            description: 'Lifetime access to MemeSmith Pro',
+            images: ['https://btbifnkqslcleqyxptec.supabase.co/storage/v1/object/public/memesmith/pro-pack.jpg'],
+          },
+          unit_amount: 2999, // $29.99
+        },
+        quantity: 1,
+      }];
+    } else if (planType === 'paymeme') {
+      // Pay per meme
+      lineItems = [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'MemeSmith Pay Per Meme',
+            description: '10 additional memes ($0.50 each)',
+            images: ['https://btbifnkqslcleqyxptec.supabase.co/storage/v1/object/public/memesmith/pro-pack.jpg'],
+          },
+          unit_amount: 500, // $5.00 for 10 memes ($0.50 each)
+        },
+        quantity: 1,
+      }];
+    }
+    
+    // Create a Stripe Checkout Session with the determined configuration
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'MemeSmith Pro Pack',
-              description: 'Unlock premium features for MemeSmith',
-              images: ['https://btbifnkqslcleqyxptec.supabase.co/storage/v1/object/public/memesmith/pro-pack.jpg'],
-            },
-            unit_amount: 1999, // $19.99
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
+      line_items: lineItems,
+      mode: mode,
       success_url: `${returnUrl}/upgrade-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${returnUrl}`,
       client_reference_id: userId,
       metadata: {
-        userId: userId
+        userId,
+        planType,
+        planName
       }
     });
     
-    logStep('Checkout session created', { sessionId: session.id });
+    logStep('Checkout session created', { sessionId: session.id, planType });
     
     return {
       statusCode: 200,

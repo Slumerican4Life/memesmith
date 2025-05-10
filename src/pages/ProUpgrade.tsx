@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader2, CreditCard, CheckCircle2, XCircle } from 'lucide-react';
+import { Loader2, CreditCard, CheckCircle2, XCircle, Star, Zap } from 'lucide-react';
 
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -9,14 +9,65 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/components/ui/sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const ProUpgrade = () => {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState('lifetime');
   
-  const handleUpgrade = async () => {
+  const plans = {
+    lifetime: {
+      name: 'Lifetime',
+      price: '$29.99',
+      priceId: 'lifetime_2999',
+      amount: 2999,
+      description: 'One-time payment',
+      highlight: true,
+      features: [
+        'All Pro features forever',
+        'Unlimited memes',
+        'Premium templates',
+        'Advanced text effects',
+        'High-resolution downloads',
+        'Priority support',
+        'Early access to new features'
+      ]
+    },
+    monthly: {
+      name: 'Monthly',
+      price: '$9.99',
+      priceId: 'monthly_999',
+      amount: 999,
+      description: 'Billed monthly',
+      highlight: false,
+      features: [
+        'All Pro features',
+        'Unlimited memes',
+        'Premium templates',
+        'Advanced text effects',
+        'High-resolution downloads'
+      ]
+    },
+    paymeme: {
+      name: 'Pay Per Meme',
+      price: '$0.50',
+      priceId: 'paymeme_50',
+      amount: 50,
+      description: 'After 3 free memes',
+      highlight: false,
+      features: [
+        '3 free memes to start',
+        '$0.50 per additional meme',
+        'Basic templates',
+        'Standard resolution'
+      ]
+    }
+  };
+  
+  const handleUpgrade = async (planType) => {
     if (!user) {
       toast({
         title: "Authentication required",
@@ -38,6 +89,8 @@ const ProUpgrade = () => {
     setIsLoading(true);
     
     try {
+      const plan = plans[planType];
+      
       // Call the create-checkout Netlify function
       const response = await fetch('/.netlify/functions/create-checkout', {
         method: 'POST',
@@ -47,6 +100,9 @@ const ProUpgrade = () => {
         body: JSON.stringify({
           userId: user.id,
           returnUrl: window.location.origin,
+          planType: planType,
+          amount: plan.amount,
+          planName: plan.name
         }),
       });
       
@@ -89,7 +145,30 @@ const ProUpgrade = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        {/* Mobile View - Cards Stack Vertically */}
+        <div className="md:hidden space-y-6 mb-8">
+          <Tabs defaultValue="lifetime" onValueChange={setSelectedPlan}>
+            <TabsList className="grid grid-cols-3 mb-6">
+              <TabsTrigger value="lifetime" className="text-xs">Lifetime</TabsTrigger>
+              <TabsTrigger value="monthly" className="text-xs">Monthly</TabsTrigger>
+              <TabsTrigger value="paymeme" className="text-xs">Pay Per Meme</TabsTrigger>
+            </TabsList>
+            
+            {Object.entries(plans).map(([key, plan]) => (
+              <TabsContent key={key} value={key} className="mt-0">
+                <PricingCard
+                  plan={plan}
+                  isLoading={isLoading && selectedPlan === key}
+                  isPro={profile?.is_pro || false}
+                  onUpgrade={() => handleUpgrade(key)}
+                />
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
+
+        {/* Desktop View - Cards in a Grid */}
+        <div className="hidden md:grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Free Plan */}
           <Card className="border-border">
             <CardHeader>
@@ -132,73 +211,38 @@ const ProUpgrade = () => {
             </CardFooter>
           </Card>
 
-          {/* Pro Plan */}
-          <Card className="border-meme-purple/40 bg-gradient-to-b from-background to-purple-900/5 shadow-lg relative overflow-hidden">
-            <div className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 bg-meme-purple/10 rounded-full w-64 h-64 blur-3xl"></div>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>Pro Pack</CardTitle>
-                <Badge className="bg-meme-purple text-white">RECOMMENDED</Badge>
-              </div>
-              <CardDescription>Unlock all features</CardDescription>
-              <div className="mt-4 text-4xl font-bold">$19.99</div>
-              <div className="text-sm text-muted-foreground">One-time payment</div>
-            </CardHeader>
-            <CardContent className="space-y-4 relative z-10">
-              <div className="space-y-2">
-                <div className="flex items-center">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mr-2" />
-                  <span>All free features</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mr-2" />
-                  <span>Premium templates library</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mr-2" />
-                  <span>Advanced text styles and effects</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mr-2" />
-                  <span>High-resolution downloads</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mr-2" />
-                  <span>Priority support</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle2 className="h-5 w-5 text-green-500 mr-2" />
-                  <span>Early access to new features</span>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="relative z-10">
-              {profile?.is_pro ? (
-                <Button className="w-full bg-green-600 hover:bg-green-700" disabled>
-                  <CheckCircle2 className="h-5 w-5 mr-2" />
-                  Already Upgraded
-                </Button>
-              ) : (
-                <Button 
-                  className="w-full bg-meme-purple hover:bg-meme-purple/90" 
-                  onClick={handleUpgrade}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="h-5 w-5 mr-2" />
-                      Upgrade Now
-                    </>
-                  )}
-                </Button>
-              )}
-            </CardFooter>
-          </Card>
+          {/* Lifetime Plan */}
+          <PricingCard
+            plan={plans.lifetime}
+            isLoading={isLoading && selectedPlan === 'lifetime'}
+            isPro={profile?.is_pro || false}
+            onUpgrade={() => handleUpgrade('lifetime')}
+          />
+
+          <Tabs defaultValue="monthly" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="monthly">Monthly</TabsTrigger>
+              <TabsTrigger value="paymeme">Pay Per Meme</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="monthly" className="mt-0">
+              <PricingCard
+                plan={plans.monthly}
+                isLoading={isLoading && selectedPlan === 'monthly'}
+                isPro={profile?.is_pro || false}
+                onUpgrade={() => handleUpgrade('monthly')}
+              />
+            </TabsContent>
+            
+            <TabsContent value="paymeme" className="mt-0">
+              <PricingCard
+                plan={plans.paymeme}
+                isLoading={isLoading && selectedPlan === 'paymeme'}
+                isPro={profile?.is_pro || false}
+                onUpgrade={() => handleUpgrade('paymeme')}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
         
         <div className="mt-12 text-center max-w-2xl mx-auto">
@@ -211,6 +255,64 @@ const ProUpgrade = () => {
       
       <Footer />
     </div>
+  );
+};
+
+const PricingCard = ({ plan, isLoading, isPro, onUpgrade }) => {
+  const getPlanIcon = () => {
+    if (plan.name === 'Lifetime') return <Star className="h-5 w-5 mr-2" />;
+    if (plan.name === 'Monthly') return <Zap className="h-5 w-5 mr-2" />;
+    return <CreditCard className="h-5 w-5 mr-2" />;
+  };
+  
+  return (
+    <Card className={`border-${plan.highlight ? 'meme-purple/40' : 'border'} ${plan.highlight ? 'bg-gradient-to-b from-background to-purple-900/5 shadow-lg' : ''} relative overflow-hidden h-full`}>
+      {plan.highlight && <div className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 bg-meme-purple/10 rounded-full w-64 h-64 blur-3xl"></div>}
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <CardTitle>{plan.name}</CardTitle>
+          {plan.highlight && <Badge className="bg-meme-purple text-white">RECOMMENDED</Badge>}
+        </div>
+        <CardDescription>{plan.description}</CardDescription>
+        <div className="mt-4 text-4xl font-bold">{plan.price}</div>
+      </CardHeader>
+      <CardContent className="space-y-4 relative z-10 flex-grow">
+        <div className="space-y-2">
+          {plan.features.map((feature, i) => (
+            <div key={i} className="flex items-center">
+              <CheckCircle2 className="h-5 w-5 text-green-500 mr-2" />
+              <span>{feature}</span>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+      <CardFooter className="relative z-10">
+        {isPro ? (
+          <Button className="w-full bg-green-600 hover:bg-green-700" disabled>
+            <CheckCircle2 className="h-5 w-5 mr-2" />
+            Already Upgraded
+          </Button>
+        ) : (
+          <Button 
+            className={`w-full ${plan.highlight ? 'bg-meme-purple hover:bg-meme-purple/90' : ''}`}
+            onClick={onUpgrade}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                Processing...
+              </>
+            ) : (
+              <>
+                {getPlanIcon()}
+                Choose {plan.name}
+              </>
+            )}
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
   );
 };
 
