@@ -4,9 +4,8 @@ import * as React from "react"
 const MOBILE_BREAKPOINT = 768
 const DEBOUNCE_DELAY = 1500 // Increased to 1500ms for better stability
 
-export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
-  const [isInitialized, setIsInitialized] = React.useState(false)
+export function useIsMobile(): boolean {
+  const [isMobile, setIsMobile] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     // Initial check
@@ -14,7 +13,6 @@ export function useIsMobile() {
     
     // Set initial value
     setIsMobile(checkMobile())
-    setIsInitialized(true)
     
     // Debounced handler to prevent rapid state changes
     let debounceTimer: number | null = null
@@ -55,8 +53,5 @@ export function useIsMobile() {
     }
   }, [])
 
-  return {
-    isMobile: isMobile === undefined ? false : isMobile,
-    isInitialized
-  }
+  return isMobile
 }
