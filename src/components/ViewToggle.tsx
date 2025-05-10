@@ -1,14 +1,8 @@
 
 import React from 'react';
 import { Smartphone } from "lucide-react";
-import { useView } from '@/contexts/ViewContext';
 
-// This component is simplified to just show the mobile icon with no toggle functionality
 const ViewToggle = () => {
-  const { isInitialized } = useView();
-  
-  if (!isInitialized) return null;
-  
   return (
     <div className="flex items-center justify-center gap-2 px-2 py-1 border border-border rounded-md bg-meme-purple/10">
       <div className="flex items-center gap-1">

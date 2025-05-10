@@ -1,9 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { MemeTemplate } from '../types/meme';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Sparkles, Lock } from 'lucide-react';
+import { Sparkles, Lock, Image } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
@@ -25,6 +25,7 @@ const MemeGallery = ({
   const navigate = useNavigate();
   const { profile } = useAuth();
   const isPro = profile?.is_pro || false;
+  const [imageErrors, setImageErrors] = useState<{[key: string]: boolean}>({});
   
   const handleTemplateClick = (template: MemeTemplate) => {
     // Check if template is pro-only and user is not pro
@@ -39,6 +40,31 @@ const MemeGallery = ({
     }
     
     onSelectTemplate(template);
+  };
+
+  // Function to handle image loading errors
+  const handleImageError = (templateId: string) => {
+    setImageErrors(prev => ({
+      ...prev,
+      [templateId]: true
+    }));
+    console.error(`Error loading image for template: ${templateId}`);
+  };
+  
+  // Placeholder images from Unsplash
+  const placeholderImages = [
+    "https://images.unsplash.com/photo-1518770660439-4636190af475",
+    "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+    "https://images.unsplash.com/photo-1470813740244-df37b8c1edcb",
+    "https://images.unsplash.com/photo-1500673922987-e212871fec22",
+    "https://images.unsplash.com/photo-1649972904349-6e44c42644a7"
+  ];
+  
+  // Function to get a placeholder image based on template id
+  const getPlaceholderImage = (templateId: string) => {
+    // Use the template id to deterministically pick a placeholder
+    const index = templateId.charCodeAt(0) % placeholderImages.length;
+    return placeholderImages[index];
   };
   
   return (
@@ -67,12 +93,20 @@ const MemeGallery = ({
               onClick={() => handleTemplateClick(template)}
             >
               <div className="aspect-square overflow-hidden">
-                <img 
-                  src={template.url} 
-                  alt={template.name}
-                  className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${template.pro_only && !isPro ? 'filter blur-[1px]' : ''}`}
-                  loading="lazy"
-                />
+                {imageErrors[template.id] ? (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-meme-purple/20 to-meme-pink/20">
+                    <Image className="h-8 w-8 text-muted-foreground" />
+                    <span className="sr-only">{template.name}</span>
+                  </div>
+                ) : (
+                  <img 
+                    src={template.url || getPlaceholderImage(template.id)} 
+                    alt={template.name}
+                    className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 ${template.pro_only && !isPro ? 'filter blur-[1px]' : ''}`}
+                    loading="lazy"
+                    onError={() => handleImageError(template.id)}
+                  />
+                )}
               </div>
               
               {!compact && (
