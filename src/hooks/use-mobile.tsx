@@ -2,41 +2,29 @@
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
-const DEBOUNCE_DELAY = 100 // Quick response time for better UX
 
 export function useIsMobile(): { isMobile: boolean; isInitialized: boolean } {
   const [isMobile, setIsMobile] = React.useState<boolean>(false)
   const [isInitialized, setIsInitialized] = React.useState(false)
 
   React.useEffect(() => {
-    // Simple check function
+    // Simple function to check if device is mobile based on width
     const checkMobile = () => window.innerWidth < MOBILE_BREAKPOINT
     
-    // Set initial value immediately
+    // Set initial value
     setIsMobile(checkMobile())
     setIsInitialized(true)
     
-    // Debounced handler for resize
-    let debounceTimer: number | null = null
-    
+    // Add resize listener
     const handleResize = () => {
-      if (debounceTimer) {
-        window.clearTimeout(debounceTimer)
-      }
-      
-      debounceTimer = window.setTimeout(() => {
-        setIsMobile(checkMobile())
-      }, DEBOUNCE_DELAY)
+      setIsMobile(checkMobile())
     }
     
-    // Add standard resize event listener
     window.addEventListener('resize', handleResize)
     
+    // Clean up
     return () => {
       window.removeEventListener('resize', handleResize)
-      if (debounceTimer) {
-        window.clearTimeout(debounceTimer)
-      }
     }
   }, [])
 
