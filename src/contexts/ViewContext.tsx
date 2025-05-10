@@ -19,7 +19,7 @@ export function ViewProvider({ children }: { children: React.ReactNode }) {
   
   // Use our simplified hook for mobile detection
   const isMobile = useIsMobile();
-  const actualDeviceType = isMobile ? 'mobile' : 'desktop';
+  const actualDeviceType = isMobile ? 'mobile' as const : 'desktop' as const;
   
   // On mount - load saved preference from localStorage if available
   useEffect(() => {

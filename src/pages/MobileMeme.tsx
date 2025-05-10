@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Image, Upload, Monitor, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import MobileUpload from '@/components/MobileUpload';
@@ -17,7 +16,8 @@ import Head from '@/components/Head';
 import { useView } from '@/contexts/ViewContext';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
-const MobileMeme = () => {
+// Create a memoized component for better performance
+const MobileMeme = React.memo(() => {
   const navigate = useNavigate();
   const { viewMode, setViewMode } = useView();
   const [customImage, setCustomImage] = useState<string | undefined>();
@@ -30,21 +30,37 @@ const MobileMeme = () => {
   const { profile } = useAuth();
   const isPro = profile?.is_pro || false;
   
-  // Load templates from JSON file
-  React.useEffect(() => {
+  // Load templates from JSON file - use an effect with proper cleanup
+  useEffect(() => {
+    let isMounted = true;
+    
     const loadTemplates = async () => {
+      if (!isMounted) return;
+      
       try {
         const response = await fetch('/memeTemplates.json');
+        if (!response.ok) throw new Error(`Failed to load templates: ${response.status}`);
+        
         const data: MemeTemplate[] = await response.json();
-        setTemplates(data);
-        setLoading(false);
+        
+        if (isMounted) {
+          setTemplates(data);
+          setLoading(false);
+        }
       } catch (error) {
         console.error("Error loading meme templates:", error);
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
     
     loadTemplates();
+    
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
   }, []);
   
   const handleImageSelected = (imageData: string) => {
@@ -60,6 +76,13 @@ const MobileMeme = () => {
   const handleBackClick = () => {
     navigate('/');
   };
+
+  // Use stable callbacks with useCallback to prevent unnecessary re-renders
+  const handleViewModeChange = React.useCallback((value: string) => {
+    if (value) {
+      setViewMode(value as 'auto' | 'mobile' | 'desktop');
+    }
+  }, [setViewMode]);
   
   // Generate dynamic meta description based on selected template
   const metaDescription = selectedTemplate 
@@ -96,7 +119,7 @@ const MobileMeme = () => {
           <ToggleGroup 
             type="single" 
             value={viewMode} 
-            onValueChange={(value) => value && setViewMode(value as 'auto' | 'mobile' | 'desktop')}
+            onValueChange={handleViewModeChange}
             className="border border-border rounded-md"
           >
             <ToggleGroupItem value="auto" aria-label="Auto view" className="p-1 h-8 w-8">
@@ -217,6 +240,9 @@ const MobileMeme = () => {
       </main>
     </div>
   );
-};
+});
+
+// Give the component a display name for better debugging
+MobileMeme.displayName = 'MobileMeme';
 
 export default MobileMeme;
