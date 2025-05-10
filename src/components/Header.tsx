@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { User, Award, Flame, Sword, Image, Compass } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProBadge from './ProBadge';
+import ViewToggle from './ViewToggle';
 
 const Header = () => {
   const { user, profile, signOut } = useAuth();
@@ -50,6 +51,10 @@ const Header = () => {
           </div>
         </Link>
         
+        <div className="hidden sm:block">
+          <ViewToggle />
+        </div>
+        
         <nav>
           <ul className="flex items-center gap-6">
             <li>
@@ -77,7 +82,7 @@ const Header = () => {
                   to="/my-memes" 
                   className={`${isActive('/my-memes') ? 'text-foreground' : 'text-muted-foreground'} hover:text-foreground transition-colors flex items-center gap-1`}
                 >
-                  <Image className="w-4 h-4" />
+                  <Image className="w-4 w-4" />
                   My Memes
                 </Link>
               </li>

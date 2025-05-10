@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { AuthProvider } from "./contexts/AuthContext";
 import { HelmetProvider } from 'react-helmet-async';
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ViewProvider, useView } from "./contexts/ViewContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import MobileMeme from "./pages/MobileMeme";
@@ -48,18 +49,18 @@ const registerServiceWorker = async () => {
   }
 };
 
-// Responsive component that renders different content based on device size
-// Instead of redirecting, which can cause flickering
+// Responsive component that renders different content based on device size and user preference
 const ResponsiveHome = () => {
   const isMobile = useIsMobile();
+  const { viewMode, actualDeviceType } = useView();
   const [initialCheckDone, setInitialCheckDone] = useState(false);
   
   // Set initial check done after first render
   useEffect(() => {
-    if (isMobile !== undefined) {
+    if (isMobile !== undefined && actualDeviceType !== undefined) {
       setInitialCheckDone(true);
     }
-  }, [isMobile]);
+  }, [isMobile, actualDeviceType]);
   
   // Show a loading state until we know the device type
   if (!initialCheckDone) {
@@ -70,8 +71,24 @@ const ResponsiveHome = () => {
     );
   }
   
-  // Render the appropriate component based on device size
-  return isMobile ? <MobileMeme /> : <Index />;
+  // Determine which view to show based on viewMode
+  let showMobileView = false;
+  
+  switch (viewMode) {
+    case 'auto':
+      // In auto mode, use the actual device type
+      showMobileView = actualDeviceType === 'mobile';
+      break;
+    case 'mobile':
+      showMobileView = true;
+      break;
+    case 'desktop':
+      showMobileView = false;
+      break;
+  }
+  
+  // Render the appropriate component based on the determined view
+  return showMobileView ? <MobileMeme /> : <Index />;
 };
 
 const App = () => {
@@ -84,49 +101,51 @@ const App = () => {
       <BrowserRouter>
         <TooltipProvider>
           <AuthProvider>
-            <HelmetProvider>
-              <Toaster />
-              <Sonner />
-              <InstallPWA />
-              <Routes>
-                <Route path="/" element={<ResponsiveHome />} />
-                <Route path="/mobile" element={<ResponsiveHome />} />
-                
-                {/* Meme Routes */}
-                <Route path="/memes/:id" element={<MemeDetail />} />
-                <Route path="/my-memes" element={
-                  <ProtectedRoute>
-                    <MyMemes />
-                  </ProtectedRoute>
-                } />
-                <Route path="/explore" element={<ExploreMemes />} />
-                
-                {/* Auth Routes */}
-                <Route path="/auth/login" element={<Login />} />
-                <Route path="/auth/register" element={<Register />} />
-                <Route path="/auth/forgot-password" element={<ForgotPassword />} />
-                <Route path="/auth/update-password" element={<UpdatePassword />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
-                
-                {/* Protected Routes */}
-                <Route path="/profile" element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                } />
-                
-                {/* Pro Upgrade Routes */}
-                <Route path="/upgrade" element={<ProUpgrade />} />
-                <Route path="/upgrade-success" element={<UpgradeSuccess />} />
-                
-                {/* Legal Routes */}
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/privacy" element={<Privacy />} />
-                
-                {/* Catch-all 404 route */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </HelmetProvider>
+            <ViewProvider>
+              <HelmetProvider>
+                <Toaster />
+                <Sonner />
+                <InstallPWA />
+                <Routes>
+                  <Route path="/" element={<ResponsiveHome />} />
+                  <Route path="/mobile" element={<ResponsiveHome />} />
+                  
+                  {/* Meme Routes */}
+                  <Route path="/memes/:id" element={<MemeDetail />} />
+                  <Route path="/my-memes" element={
+                    <ProtectedRoute>
+                      <MyMemes />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/explore" element={<ExploreMemes />} />
+                  
+                  {/* Auth Routes */}
+                  <Route path="/auth/login" element={<Login />} />
+                  <Route path="/auth/register" element={<Register />} />
+                  <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/auth/update-password" element={<UpdatePassword />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
+                  
+                  {/* Protected Routes */}
+                  <Route path="/profile" element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Pro Upgrade Routes */}
+                  <Route path="/upgrade" element={<ProUpgrade />} />
+                  <Route path="/upgrade-success" element={<UpgradeSuccess />} />
+                  
+                  {/* Legal Routes */}
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  
+                  {/* Catch-all 404 route */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </HelmetProvider>
+            </ViewProvider>
           </AuthProvider>
         </TooltipProvider>
       </BrowserRouter>
