@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ChevronLeft, Image, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,6 @@ import MemeCanvas from '@/components/MemeCanvas';
 import { useNavigate } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import MemeGallery from "@/components/MemeGallery";
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useAuth } from '@/contexts/AuthContext';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,7 +23,6 @@ const MobileMeme = () => {
   const [bottomText, setBottomText] = useState("");
   const [loading, setLoading] = useState(true);
   const [effect, setEffect] = useState<'none' | 'glow' | 'golden'>('none');
-  const isMobile = useIsMobile();
   const { profile } = useAuth();
   const isPro = profile?.is_pro || false;
   
@@ -59,13 +56,6 @@ const MobileMeme = () => {
   const handleBackClick = () => {
     navigate('/');
   };
-
-  // Redirect to index page if not on mobile
-  React.useEffect(() => {
-    if (!isMobile) {
-      navigate('/');
-    }
-  }, [isMobile, navigate]);
   
   // Generate dynamic meta description based on selected template
   const metaDescription = selectedTemplate 

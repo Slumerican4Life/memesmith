@@ -2,7 +2,7 @@
 import * as React from "react"
 
 const MOBILE_BREAKPOINT = 768
-const DEBOUNCE_DELAY = 100 // Add debounce delay to prevent flickering
+const DEBOUNCE_DELAY = 300 // Increased from 100 to 300 for better stability
 
 export function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
